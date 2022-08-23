@@ -4,13 +4,13 @@ const maxCellsAmount = 100;
 const cutWith = 0;
 const variantsAmount = 1000;
 const billetsOrder = 'default';
-const doubleCut = true;
+const doubleCut = false;
 
 // ! исх.хлысты
 // !
 const billetsDataProfile = [1,1,1,1];
 const billetsDataAmount = [1,1,1,10];
-const billetsDataLenghth = [4500,5000,5200,6000];
+const billetsDataLength = [4500,5000,5200,6000];
 
 // ! исх.детали
 // !
@@ -18,7 +18,7 @@ const detailsDataId = [1,2,3,4,5,6,7,8];
 const detailsDataProfile = [1,1,1,1,1,1,2,2];
 const detailsDataComplect = ['100','100','101','101','002','003','800','800'];
 const detailsDataAmount = [2,2,2,2,4,4,2,2];
-const detailsDataLenghth = [1100,800,1200,950,1300,700,1500,1000];
+const detailsDataLength = [1100,800,1200,950,1300,700,1500,1000];
 
 // * создадим массив хлыстов
 var billets = [];
@@ -27,10 +27,15 @@ for (let i = 0; i < billetsDataProfile.length; i++) {
         id:i,
         profile: billetsDataProfile[i],
         amount: billetsDataAmount[i],
-        lenghth: billetsDataLenghth[i]
+        length: billetsDataLength[i],
+        rest: 0
      };
      billets.push(element);
 }
+if (doubleCut) {
+    billets.sort((a,b) => (a.length > b.length));    
+}
+console.log(billets);
 
 // * создадим массив деталей 
 var details = [];
@@ -38,7 +43,7 @@ for (let i = 0; i < detailsDataId.length; i++) {
     const element = {
         profile: detailsDataProfile[i],
         amount: detailsDataProfile[i],
-        lenghth: detailsDataLenghth[i],
+        length: detailsDataLength[i],
         complectId: detailsDataComplect[i],
         cell: 0,
         cut: 0
@@ -107,37 +112,59 @@ function deepCopy (obj) {
   } 
   
 
-// ! создадим массив плана резки
+// ! создадим (и заполним) массив плана резки
 // !
 var plan = [];
 
 for (let cut = 1; cut < curCut; cut++) {
-   /* var bestVariant = [{
-    billet = {
-    billetId:0,
-    billetLength:0,
-    billetDetails:[],
-    rest:0 
-   }]; */
-   
-    
+
+    // * лучший план в резке
+    var bestCut = [ {billetAmount: 0, billetRest: 0, plan: []} ] ; 
+
+     // * получим хлысты резки
+    var locBillets = billets.filter((element) => element.profile = cuts[cut].profile);
+    locBillets.forEach(element => {
+        element.rest = element.length;   
+    });
+
+    // * построим много планов резки, оставим лучший
+    for (let variant = 1; variant < variantsAmount; variant++) {
+        
+        // * получим детали резки
+        var locDetails = deepCopy(details);
+        shuffle(locDetails);
+
+        // * разложим 
+        if (doubleCut) {
+            
+        } else {
+            for (let d = 0; d < locDetails.length; d++) {
+                var detailSucsess = false;
+                for (let b = 0; b < locBillets.length; b++) {
+                    if ((locBillets[b].rest) - cutWith >= locDetails[d].length) {
+                        
+
+                    } else {
+                        
+                    }
+                    
+                }
+        
+            };          
+        }
+ 
+
+
+        
+    };
+
 
 }
 
 
   
-    // * получим хлысты резки
-    var locBillets = Billets.filter((element) => element.profile = cuts[cut].profile);
 
-    // * получим детали резки
-    var locDetails = deepCopy(details);
-    shuffle(locDetails);
-
-    // * разложим 
-    for (let i = 0; i < locDetails.length; i++) {
-        const element = locDetails[i];
-        
-    };
+    
 
 
  
