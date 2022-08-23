@@ -1,16 +1,19 @@
-// исх.реквизиты
+// ! исх.реквизиты
+// !
 const maxCellsAmount = 100;
 const cutWith = 0;
 const variantsAmount = 1000;
 const billetsOrder = 'default';
 const doubleCut = true;
 
-// исх.хлысты
+// ! исх.хлысты
+// !
 const billetsDataProfile = [1,1,1,1];
 const billetsDataAmount = [1,1,1,10];
 const billetsDataLenghth = [4500,5000,5200,6000];
 
-// исх.детали
+// ! исх.детали
+// !
 const detailsDataId = [1,2,3,4,5,6,7,8];
 const detailsDataProfile = [1,1,1,1,1,1,2,2];
 const detailsDataComplect = ['100','100','101','101','002','003','800','800'];
@@ -65,7 +68,8 @@ for (let i = 1; i < details.length; i++) {
 };
 //console.log(details);
 
-// создадим массив плана резки
+// ! создадим массив плана резки
+// !
 var plan = [];
 for (let cut = 1; cut < curCut; cut++) {
     const element = elementOfPlan(cut);
@@ -96,10 +100,22 @@ function deepCopy (obj) {
     return obj
   }
 
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      let j = Math.floor(Math.random() * (i + 1)); 
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  } 
   
 function elementOfPlan(locCut) {
-    // получим хлысты резки
-    const locBillets = Array.from(Billets);
+    // * получим хлысты резки
+    const locBillets = deepCopy(Billets);
+    shuffle(locBillets);
+    for (let i = 0; i < locBillets.length; i++) {
+        const element = locBillets[i];
+        
+    }
+
 
     // получим детали резки
  
