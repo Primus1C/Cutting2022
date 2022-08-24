@@ -20,6 +20,47 @@ const detailsDataComplect = ['100','100','101','101','002','003','800','800'];
 const detailsDataAmount = [2,2,2,2,4,4,2,2];
 const detailsDataLength = [1100,800,1200,950,1300,700,1500,1000];
 
+// ! исх данные (выше) в этом файле генерируются программно
+
+
+// ! служебные процедуры и функции 
+// !
+
+function deepCopy (obj) {
+
+  if ('object' === typeof obj) {
+    if (obj instanceof Array) {
+      let length = obj.length
+      let newObj = new Array(length)
+      for (let i = 0; i < length; i++) {
+        newObj[i] = (deepCopy(obj[i]))
+      }
+      return newObj
+    } else {
+      let newObj = {}
+      if (obj.prototype) {
+        newObj.prototype = obj.prototype
+      }
+      for (let key in obj) {
+        newObj[key] = deepCopy(obj[key])
+      }
+      return newObj
+    }
+  }
+  return obj
+}
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1)); 
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+} 
+
+
+// ! основной функционал
+// !
+
 // * создадим массив хлыстов
 var billets = [];
 for (let i = 0; i < billetsDataProfile.length; i++) {
@@ -78,42 +119,11 @@ for (let i = 1; i < details.length; i++) {
 //console.log(cuts);
 
 
-// ! служебные процедуры и функции
-// !
-function deepCopy (obj) {
 
-    if ('object' === typeof obj) {
-      if (obj instanceof Array) {
-        let length = obj.length
-        let newObj = new Array(length)
-        for (let i = 0; i < length; i++) {
-          newObj[i] = (deepCopy(obj[i]))
-        }
-        return newObj
-      } else {
-        let newObj = {}
-        if (obj.prototype) {
-          newObj.prototype = obj.prototype
-        }
-        for (let key in obj) {
-          newObj[key] = deepCopy(obj[key])
-        }
-        return newObj
-      }
-    }
-    return obj
-  }
-
-  function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      let j = Math.floor(Math.random() * (i + 1)); 
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-  } 
   
 
-// ! создадим (и заполним) массив плана резки
-// !
+// * создадим (и заполним) массив плана резки
+
 var plan = [];
 
 for (let cut = 1; cut < curCut; cut++) {
@@ -142,10 +152,13 @@ for (let cut = 1; cut < curCut; cut++) {
                 var detailSucsess = false;
                 for (let b = 0; b < locBillets.length; b++) {
                     if ((locBillets[b].rest) - cutWith >= locDetails[d].length) {
-                        
+                      //locBillets[b].
+                      locBillets[b].rest = locBillets[b].rest - cutWith - locDetails[d].length;    
 
+                      detailSucsess = true;
                     } else {
-                        
+                    
+                      
                     }
                     
                 }
