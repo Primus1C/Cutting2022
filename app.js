@@ -2,7 +2,7 @@
 // !
 const maxCellsAmount = 100;
 const cutWith = 0;
-const variantsAmount = 1000;
+const variantsAmount = 1;
 const billetsOrder = 'default';
 const doubleCut = false;
 
@@ -20,6 +20,7 @@ const detailsDataComplect = ['100','100','101','101','002','003','800','800'];
 const detailsDataAmount = [2,2,2,2,4,4,2,2];
 const detailsDataLength = [1100,800,1200,950,1300,700,1500,1000];
 
+// !
 // ! исх данные (выше) в этом файле генерируются программно
 
 
@@ -57,6 +58,14 @@ function shuffle(array) {
   }
 } 
 
+function newCut() {
+    const result = {
+        billetAmount: 0, 
+        lastBilletRest: 0, 
+        plan: []
+    }; 
+    return result;
+}
 
 // ! основной функционал
 // !
@@ -69,7 +78,8 @@ for (let i = 0; i < billetsDataProfile.length; i++) {
       id:i,
       profile: billetsDataProfile[i],
       length: billetsDataLength[i],
-      rest: billetsDataLength[i]
+      rest: billetsDataLength[i],
+      details: []
     };
     billets.push(element);
   } 
@@ -99,7 +109,7 @@ for (let i = 0; i < detailsDataId.length; i++) {
 details.sort( (a,b) => (a.profile === b.profile) ? a.complectId - b.complectId: a.profile > b.profile );
 //console.log(details);
 
-cuts = [ {cut:1, profile:details[0].profile} ];
+const cuts = [ {cut:1, profile:details[0].profile} ];
 maxCut = 1;
 maxCell = 1;
 details[0].cut = maxCut;
@@ -120,7 +130,6 @@ for (let i = 1; i < details.length; i++) {
     details[i].cell = maxCell; 
     details[i].cut = maxCut; 
 };
-//console.log(details);
 //console.log(cuts);
 
 
@@ -129,31 +138,20 @@ for (let i = 1; i < details.length; i++) {
 
 // * создадим (и заполним) массив плана резки
 
-var plan = [];
+var plans = [];
 
-for (let cut = 1; cut < maxCut; cut++) {
+for (let cut = 1; cut < maxCut+1; cut++) {
 
     // * лучший план в резке
-    var bestCut = {
-      billetAmount: 0, 
-      lastBilletRest: 0, 
-      plan: []
-    }; 
+    var bestCut = newCut();
 
      // * получим хлысты резки
     var locBillets = billets.filter((element) => element.profile = cuts[cut].profile);
-    locBillets.forEach(element => {
-        element.rest = element.length;   
-    });
-
-    // * построим много планов резки, оставим лучший
-    for (let variant = 1; variant < variantsAmount; variant++) {
+    
+    // * построим <variantsAmount> планов резки, оставим лучший
+    for (let variant = 0; variant < variantsAmount; variant++) {
         
-        curCut = {
-          billetAmount: 0, 
-          lastBilletRest: 0, 
-          plan: []
-        }; 
+        curCut = newCut(); 
 
         // * получим детали резки
         var locDetails = deepCopy(details);
@@ -163,22 +161,48 @@ for (let cut = 1; cut < maxCut; cut++) {
         if (doubleCut) {
             
         } else {
+            var cutSucsess = false;
             for (let d = 0; d < locDetails.length; d++) {
-                var detailSucsess = false;
+                var cutSucsess = false;
                 for (let b = 0; b < locBillets.length; b++) {
                     if ((locBillets[b].rest) - cutWith >= locDetails[d].length) {
-                      //locBillets[b].
-                      locBillets[b].rest = locBillets[b].rest - cutWith - locDetails[d].length;    
-
-                      detailSucsess = true;
-                    } else {
-                    
-                      
+                        locBillets[b].rest = locBillets[b].rest - cutWith - locDetails[d].length; 
+                        //console.log(locBillets[b].details);   
+                        locBillets[b].details.push(locDetails[d].id);
+                        cutSucsess = true;
+                        break;
                     }
-                    
-                }
-        
-            };          
+                };  
+                if (!cutSucsess) {
+                  
+                    break;   
+                }        
+            };
+            if (cutSucsess) {
+                // * сравним текущию раскладку с лучшей
+                var billetAmount = 0;
+                var lastRest = 0;
+                for (let i = 0; i < locBillets.length; i++) {
+                    if (locBillets[i].rest != locBillets[i].length) {
+                      billetAmount += 1;
+                      lastRest = locBillets[i].rest;  
+                    }                  
+                };
+                changeBestCut = false;
+                if (billetAmount < bestCut.billetAmount) {
+                    changeBestCut = true;  
+                }else if (lastRest < bestCut.lastBilletRest) {
+                    changeBestCut = true; 
+                };
+                if (changeBestCut) {
+                    bestCut.billetAmount = billetAmount;
+                    bestCut.lastBilletRest = lastRest;
+                    bestCut.plan = locDetails.slice().sort();
+                    //console.log(bestCut);
+                };
+                //// * добавим хлысты, на к-рых разложены детали, в план
+
+            }    
         }
  
 
@@ -189,23 +213,6 @@ for (let cut = 1; cut < maxCut; cut++) {
 
 }
 
-
-  
-
-    
-
-
- 
- //тзПланРезки[КодХлыста,ДлинаХлыста,ДеталиХлыста,Остаток]
- //тзДеталиХлыста[Код,КодВРезке,Длина,Ячейка]
-    var billetPlan = {
-        cut:0,
-        billet:{
-        billetId:0,
-        billetLength:0,
-        billetDetails:[],
-        rest:0    
-        }  
-    }
+//console.log(bestCut);
 
   
