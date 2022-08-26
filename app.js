@@ -58,10 +58,10 @@ function shuffle(array) {
   }
 } 
 
-function newCut() {
+function newCut(billetAmount=0,lastBilletRest=0) {
     const result = {
-        billetAmount: 0, 
-        lastBilletRest: 0, 
+        billetAmount: billetAmount, 
+        lastBilletRest: lastBilletRest, 
         plan: []
     }; 
     return result;
@@ -135,21 +135,18 @@ for (let d = 1; d < details.length; d++) {
 
   
 
-// * создадим (и заполним) массив плана резки
-
+// * создадим (и заполним) массив плана резок <plans>
 var plans = [];
 
 for (let cut = 0; cut < cuts.length; cut++) {
   
-    // * лучший план в резке
-    var bestCut = newCut();
-    bestCut.billetAmount = 900000;
-    bestCut.lastBilletRest = 6000;
+    // * лучший вариант в резке
+    var bestCut = newCut(999999,6000);
 
      // * получим хлысты резки
     var locBillets = billets.filter(item => item.prof===cuts[cut].prof?true:false);
 
-    // * построим <variantsAmount> планов резки, оставим лучший
+    // * построим <variantsAmount> вариантов резки, поместим лучший из них в <bestCut>
     for (let variant = 0; variant < variantsAmount; variant++) {
         
         curCut = newCut(); 
@@ -159,10 +156,11 @@ for (let cut = 0; cut < cuts.length; cut++) {
         let locDetails = details.filter(item => item.prof===cuts[cut].prof?true:false);
         shuffle(locDetails);
 
-        // * разложим детали на хлысты
         if (doubleCut) {
             
         } else {
+            
+            // * разложим детали на хлысты в <locBillets>
             var cutSucsess = false;
             for (let d = 0; d < locDetails.length; d++) {
                 var cutSucsess = false;
@@ -174,39 +172,33 @@ for (let cut = 0; cut < cuts.length; cut++) {
                         break;
                     }
                 };  
-                //if (!cutSucsess) {
-                //  
-                //    break;   
-                //}        
+                if (!cutSucsess) {
+                    break;   
+                }        
             };
-            //console.log(cutSucsess);
+            //console.log(locBillets);
             if (cutSucsess) {
-                // * сравним текущию раскладку с лучшей
-                var billetAmount = 0;
-                var lastRest = 0;
-                for (let i = 0; i < locBillets.length; i++) {
-                    //console.log(locBillets[i].rest,locBillets[i].len);
-                    if (locBillets[i].rest != locBillets[i].len) {
-                      billetAmount += 1;
-                      lastRest = locBillets[i].rest;  
-                      //console.log(billetAmount,bestCut.billetAmount,lastRest,bestCut.lastBilletRest);
-                    }                  
-                };
-                changeBestCut = false;
-                //console.log(bestCut);
-                if (billetAmount < bestCut.billetAmount) {
-                    changeBestCut = true;  
-                }else if (lastRest < bestCut.lastBilletRest) {
-                    changeBestCut = true; 
-                };
-                //console.log(changeBestCut);
-                if (changeBestCut) {
-                    bestCut.billetAmount = billetAmount;
-                    bestCut.lastBilletRest = lastRest;
-                    bestCut.plan = locDetails.slice().sort();
-                    console.log(bestCut);
-                };
-                //// * добавим хлысты, на к-рых разложены детали, в план
+                // * сравним текущию раскладку <locBillets> с лучшей <bestCut>
+                var locBilletsWithDetails = locBillets.filter(item => item.rest===item.len?false:true);
+                var curBilletAmount = locBilletsWithDetails.length;
+                //console.log(locBilletsWithDetails);                            
+                if (curBilletAmount > 0) {
+                    var curLastRest = locBilletsWithDetails[curBilletAmount-1].rest;
+                    changeBestCut = false;
+                    //console.log(bestCut);
+                    if (curBilletAmount < bestCut.billetAmount) {
+                        changeBestCut = true;  
+                    }else if (curLastRest < bestCut.lastBilletRest) {
+                        changeBestCut = true; 
+                    };
+                    if (changeBestCut) {
+                        bestCut.billetAmount = curBilletAmount;
+                        bestCut.lastBilletRest = curLastRest;
+                        bestCut.plan = locDetails.slice().sort();
+                        console.log(bestCut);
+                    }
+                } ;
+                //// * добавим хлысты <locBillets> на к-рых разложены детали, в план <plans>
 
             }    
         }
@@ -216,7 +208,7 @@ for (let cut = 0; cut < cuts.length; cut++) {
         
     };
 
-
+    plans.push(bestCut);
 }
 
 //console.log(bestCut);
