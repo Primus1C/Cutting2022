@@ -8,17 +8,17 @@ const doubleCut = false;
 
 // ! исх.хлысты
 // !
-const billetsDataProfile = [1,1,1,1];
-const billetsDataAmount = [1,1,1,10];
-const billetsDataLength = [4500,5000,5200,6000];
+const dataBilletsProfile = [1,1,1,1,2];
+const dataBilletsAmount = [1,1,1,10,4];
+const dataBilletsLength = [4500,5000,5200,6000,5960];
 
 // ! исх.детали
 // !
-const detailsDataId = [1,2,3,4,5,6,7,8];
-const detailsDataProfile = [1,1,1,1,1,1,2,2];
-const detailsDataComplect = ['100','100','101','101','002','003','800','800'];
-const detailsDataAmount = [2,2,2,2,4,4,2,2];
-const detailsDataLength = [1100,800,1200,950,1300,700,1500,1000];
+const dataDetailsId = [1,2,3,4,5,6,7,8];
+const dataDetailsProfile = [1,1,1,1,1,1,2,2];
+const dataDetailsComplect = ['100','100','101','101','002','003','800','800'];
+const dataDetailsAmount = [2,2,2,2,4,4,2,2];
+const dataDetailsLength = [1100,800,1200,950,1300,700,1500,1000];
 
 // !
 // ! исх данные (выше) в этом файле генерируются программно
@@ -71,14 +71,14 @@ function newCut() {
 // !
 
 // * создадим массив хлыстов
-var billets = [];
-for (let i = 0; i < billetsDataProfile.length; i++) {
-  for (let a = 0; a < billetsDataAmount[i]; a++) {
-    const element = {
-      id:i,
-      profile: billetsDataProfile[i],
-      length: billetsDataLength[i],
-      rest: billetsDataLength[i],
+const billets = [];
+for (let i = 0; i < dataBilletsProfile.length; i++) {
+  for (let a = 0; a < dataBilletsAmount[i]; a++) {
+    var element = {
+      id: i,      
+      prof: dataBilletsProfile[i],
+      len: dataBilletsLength[i],
+      rest: dataBilletsLength[i],
       details: []
     };
     billets.push(element);
@@ -91,44 +91,43 @@ if (doubleCut) {
 
 // * создадим массив деталей 
 var details = [];
-for (let i = 0; i < detailsDataId.length; i++) {
-  for (let a = 0; a < detailsDataAmount[i]; a++) {
-    const element = {
-      id: i,
-      profile: detailsDataProfile[i],
-      length: detailsDataLength[i],
-      complectId: detailsDataComplect[i],
+for (let d = 0; d < dataDetailsId.length; d++) {
+  for (let a = 0; a < dataDetailsAmount[d]; a++) {
+    var element = {
+      id: dataDetailsId[d],
+      prof: dataDetailsProfile[d],
+      len: dataDetailsLength[d],
+      complect: dataDetailsComplect[d],
       cell: 0,
       cut: 0
     };
     details.push(element);
-    if (doubleCut) {a += 1};
+    if (doubleCut) {a++};
   } 
 }
-
-details.sort( (a,b) => (a.profile === b.profile) ? a.complectId - b.complectId: a.profile > b.profile );
+details.sort( (a,b) => (a.profile === b.profile) ? a.complectId - b.complectId: a.prof > b.prof );
 //console.log(details);
 
-const cuts = [ {cut:1, profile:details[0].profile} ];
+const cuts = [ {cut:1, prof:details[0].prof} ];
 maxCut = 1;
 maxCell = 1;
 details[0].cut = maxCut;
 details[0].cell = maxCell;
-for (let i = 1; i < details.length; i++) {    
-    if (details[i].profile != details[i-1].profile) {
+for (let d = 1; d < details.length; d++) {    
+    if (details[d].prof != details[d-1].prof) {
         maxCell = 1;
-        maxCut += 1;  
-        cuts.push({cut:maxCut, profile:details[i].profile}); 
-    } else if (details[i].complectId != details[i-1].complectId) {
-      maxCell += 1;
+        maxCut++;  
+        cuts.push({cut:maxCut, prof:details[d].prof}); 
+    } else if (details[d].complect != details[d-1].complect) {
+      maxCell++;
     };
     if ((maxCellsAmount > 0) && (maxCell > maxCellsAmount)) {
         maxCell = 1;
-        maxCut += 1; 
-        cuts.push({cut:curCut, profile:details[i].profile});    
+        maxCut++; 
+        cuts.push({cut:curCut, prof:details[d].prof});    
     };         
-    details[i].cell = maxCell; 
-    details[i].cut = maxCut; 
+    details[d].cell = maxCell; 
+    details[d].cut = maxCut; 
 };
 //console.log(cuts);
 
@@ -140,21 +139,24 @@ for (let i = 1; i < details.length; i++) {
 
 var plans = [];
 
-for (let cut = 1; cut < maxCut+1; cut++) {
-
+for (let cut = 0; cut < cuts.length; cut++) {
+  
     // * лучший план в резке
     var bestCut = newCut();
+    bestCut.billetAmount = 900000;
+    bestCut.lastBilletRest = 6000;
 
      // * получим хлысты резки
-    var locBillets = billets.filter((element) => element.profile = cuts[cut].profile);
-    
+    var locBillets = billets.filter(item => item.prof===cuts[cut].prof?true:false);
+
     // * построим <variantsAmount> планов резки, оставим лучший
     for (let variant = 0; variant < variantsAmount; variant++) {
         
         curCut = newCut(); 
 
         // * получим детали резки
-        var locDetails = deepCopy(details);
+        //var locDetails = deepCopy(details);
+        let locDetails = details.filter(item => item.prof===cuts[cut].prof?true:false);
         shuffle(locDetails);
 
         // * разложим детали на хлысты
@@ -165,40 +167,44 @@ for (let cut = 1; cut < maxCut+1; cut++) {
             for (let d = 0; d < locDetails.length; d++) {
                 var cutSucsess = false;
                 for (let b = 0; b < locBillets.length; b++) {
-                    if ((locBillets[b].rest) - cutWith >= locDetails[d].length) {
-                        locBillets[b].rest = locBillets[b].rest - cutWith - locDetails[d].length; 
-                        //console.log(locBillets[b].details);   
+                    if ((locBillets[b].rest) - cutWith >= locDetails[d].len) {
+                        locBillets[b].rest = locBillets[b].rest - cutWith - locDetails[d].len; 
                         locBillets[b].details.push(locDetails[d].id);
                         cutSucsess = true;
                         break;
                     }
                 };  
-                if (!cutSucsess) {
-                  
-                    break;   
-                }        
+                //if (!cutSucsess) {
+                //  
+                //    break;   
+                //}        
             };
+            //console.log(cutSucsess);
             if (cutSucsess) {
                 // * сравним текущию раскладку с лучшей
                 var billetAmount = 0;
                 var lastRest = 0;
                 for (let i = 0; i < locBillets.length; i++) {
-                    if (locBillets[i].rest != locBillets[i].length) {
+                    //console.log(locBillets[i].rest,locBillets[i].len);
+                    if (locBillets[i].rest != locBillets[i].len) {
                       billetAmount += 1;
                       lastRest = locBillets[i].rest;  
+                      //console.log(billetAmount,bestCut.billetAmount,lastRest,bestCut.lastBilletRest);
                     }                  
                 };
                 changeBestCut = false;
+                //console.log(bestCut);
                 if (billetAmount < bestCut.billetAmount) {
                     changeBestCut = true;  
                 }else if (lastRest < bestCut.lastBilletRest) {
                     changeBestCut = true; 
                 };
+                //console.log(changeBestCut);
                 if (changeBestCut) {
                     bestCut.billetAmount = billetAmount;
                     bestCut.lastBilletRest = lastRest;
                     bestCut.plan = locDetails.slice().sort();
-                    //console.log(bestCut);
+                    console.log(bestCut);
                 };
                 //// * добавим хлысты, на к-рых разложены детали, в план
 
