@@ -166,11 +166,12 @@ for (let cut = 0; cut < cuts.length; cut++) {
                 for (let b = 0; b < locBillets.length; b++) {
                     if ((locBillets[b].rest) - cutWith >= locDetails[d].len) {
                         locBillets[b].rest = locBillets[b].rest - cutWith - locDetails[d].len; 
-                        locBillets[b].details.push(locDetails[d].id);
+                        //locBillets[b].details.push(locDetails[d].id);
+                        locBillets[b].details.push(locDetails[d]);
                         cutSucsess = true;
                         break;
                     }
-                };  
+                }  
                 if (!cutSucsess) {
                     break;   
                 }        
@@ -179,39 +180,34 @@ for (let cut = 0; cut < cuts.length; cut++) {
             //console.log(cutSucsess);
             if (cutSucsess) {
                 // * сравним текущию раскладку <locBillets> с лучшей <bestCut>
-                let locBilletsWithDetails = locBillets.filter(item => item.rest===item.len?true:false);
-                let curBilletAmount = locBilletsWithDetails.length;
+                let locBilletsWithDetails = locBillets.filter(item => item.rest===item.len?false:true);
+                let locBilletAmount = locBilletsWithDetails.length;
                 //console.log(locBilletsWithDetails);                            
-                if (curBilletAmount > 0) {
-                    let curLastRest = locBilletsWithDetails[curBilletAmount-1].rest;
-                    changeBestCut = false;
+                if (locBilletAmount > 0) {
+                    let locLastRest = locBilletsWithDetails[locBilletAmount-1].rest;
+                    let changeBestCut = false;
                     //console.log(bestCut);
-                    if (curBilletAmount < bestCut.billetAmount) {
+                    if (locBilletAmount < bestCut.billetAmount) {
                         changeBestCut = true;  
-                    } else if (curLastRest < bestCut.lastBilletRest) {
+                    } else if (locLastRest < bestCut.lastBilletRest) {
                         changeBestCut = true; 
                     };
                     if (changeBestCut) {
-                        bestCut.billetAmount = curBilletAmount;
-                        bestCut.lastBilletRest = curLastRest;
-                        //bestCut.plan = locDetails.slice().sort();
-                        bestCut.plan = locBillets;
+                        bestCut.billetAmount = locBilletAmount;
+                        bestCut.lastBilletRest = locLastRest;
+                        bestCut.plan = locBilletsWithDetails;
+                        bestCut.prof = cuts[cut].prof;
                         //console.log(bestCut);
                     }
+                    // * добавим хлысты <locBilletsWithDetails> на к-рых разложены детали, в план <plans>
+                    plans.push(bestCut);
                 } 
-                //// * добавим хлысты <locBillets> на к-рых разложены детали, в план <plans>
-
             }    
         }
- 
-
-
-        
     }
-
-    plans.push(bestCut);
 }
 
-//console.log(cut);
+console.log(plans);
+
 
   
