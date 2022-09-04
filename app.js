@@ -133,7 +133,7 @@ for (let cut = 0; cut < cuts.length; cut++) {
 
     // * получим хлысты резки
     let locBillets = billets.filter(item => item.prof===cuts[cut].prof?true:false);
-    if (billetsOrder = 'FromShortToLong') {
+    if (billetsOrder === 'FromShortToLong') {
         locBillets.sort( (a,b) => a.len - b.len );
     };
 
