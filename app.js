@@ -58,14 +58,6 @@ function shuffle(array) {
     }
 } 
 
-// function newCut(billetAmount=0, lastBilletRest=0) {
-//     return {
-//         billetAmount: parseInt(billetAmount), 
-//         lastBilletRest: parseInt(lastBilletRest), 
-//         plan: []
-//     }; 
-// }
-
 // ! основной функционал
 // !
 
@@ -93,12 +85,12 @@ let details = [];
 for (let d = 0; d < dataDetailsId.length; d++) {
     for (let a = 0; a < dataDetailsAmount[d]; a++) {
         let element = {
-          id: dataDetailsId[d],
-        prof: dataDetailsProfile[d],
-        len: dataDetailsLength[d],
-        complect: dataDetailsComplect[d],
-        cell: parseInt(0),
-        cut: parseInt(0)
+            id: dataDetailsId[d],
+            prof: dataDetailsProfile[d],
+            len: dataDetailsLength[d],
+            complect: dataDetailsComplect[d],
+            cell: parseInt(0),
+            cut: parseInt(0)
         };
         details.push(element);
         if (doubleCut) {a++};
@@ -129,9 +121,6 @@ for (let d = 1; d < details.length; d++) {
     details[d].cut = maxCut; 
 };
 //console.log(cuts);
-
-
-
   
 
 // * создадим (и заполним) массив плана резок <plans>
@@ -139,23 +128,17 @@ const plans = [];
 
 for (let cut = 0; cut < cuts.length; cut++) {
   
-    // * лучший вариант в резке
-    //let bestCut = newCut(999999,6000);
-    /* let bestCut = {
-        billetAmount: 0, 
-        lastBilletRest: 0,
-        prof : '', 
-        plan: []
-    }; */
-    let bestCut = {}; // * значения критериев лучшего варианта резки
+    // * значения критериев лучшего варианта резки
+    let bestCut = {}; 
 
     // * получим хлысты резки
     let locBillets = billets.filter(item => item.prof===cuts[cut].prof?true:false);
+    if (billetsOrder = 'FromShortToLong') {
+        locBillets.sort( (a,b) => a.len - b.len );
+    };
 
     // * строим <variantsAmount> вариантов резки, помещая лучший из них в <bestCut>
     for (let variant = 0; variant < variantsAmount; variant++) {
-        
-        //curCut = newCut(); 
 
         // * получим детали резки
         //let locDetails = deepCopy(details);
@@ -165,15 +148,29 @@ for (let cut = 0; cut < cuts.length; cut++) {
         // * разложим детали на хлысты в <locBillets>
         let cutSucsess = false;
         if (doubleCut) {
-            
+            for (let d = 0; d < locDetails.length; d++) { 
+                cutSucsess = false;
+                for (let b = 0; b < locBillets.length; b+2) {
+                    let rest = (locBillets[b].rest < locBillets[b+1].rest) ? locBillets[b].rest : locBillets[b+1].rest;
+                    if (rest - cutWith >= locDetails[d].len) {
+                        locBillets[b].rest = locBillets[b].rest - cutWith - locDetails[d].len; 
+                        locBillets[b+1].rest = locBillets[b].rest - cutWith - locDetails[d].len; 
+                        locBillets[b].details.push(locDetails[d]);
+                        locBillets[b+1].details.push(locDetails[d]);
+                        cutSucsess = true;
+                        break;
+                    }
+                }    
+                if (!cutSucsess) {
+                    break; 
+                }
+            }
         } else {
-            //let cutSucsess = false;
             for (let d = 0; d < locDetails.length; d++) {
                 cutSucsess = false;
                 for (let b = 0; b < locBillets.length; b++) {
                     if ((locBillets[b].rest) - cutWith >= locDetails[d].len) {
                         locBillets[b].rest = locBillets[b].rest - cutWith - locDetails[d].len; 
-                        //locBillets[b].details.push(locDetails[d].id);
                         locBillets[b].details.push(locDetails[d]);
                         cutSucsess = true;
                         break;
@@ -183,7 +180,7 @@ for (let cut = 0; cut < cuts.length; cut++) {
                     break;   
                 } 
                 //console.log(cutSucsess,locBillets);       
-            };
+            }
         };
         //console.log(locBillets);
         //console.log(cutSucsess);
@@ -213,11 +210,13 @@ for (let cut = 0; cut < cuts.length; cut++) {
                     bestCut.lastBilletRest = locLastRest;
                     bestCut.plan = locBilletsWithDetails;
                     bestCut.prof = cuts[cut].prof;
+                    bestCut.doubleCut = doubleCut
+                    //bestCut.detailsAmount = 0
                     //console.log(bestCut);
                 }
             } 
         }
-    }
+    };
     // * добавим лучшую расладку <bestCut> в план <plans>
     if ('billetAmount' in bestCut) {
         plans.push(bestCut);
