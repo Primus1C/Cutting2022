@@ -1,5 +1,5 @@
 
-const maxCellsAmount = 50;
+const maxCellsAmount = 10;
 const cutWith = 3;
 const variantsAmount = 1000;
 const billetsOrder = 'FromShortToLong';
@@ -16,29 +16,6 @@ const dataDetailsAmount = [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
 const dataDetailsLength = [1271,456,1271,456,1271,608,1271,721,1271,721,1271,646,1271,646,1454,637,1454,612,1311,461,1311,591,1311,576,1311,581,851,544,941,539,881,431,1131,441,1221,646,1221,529,1231,556,1921,521,1251,536,1421,651,1421,651,1421,651,1421,651,1291,384,1291,384,1421,651,371,571,1281,424,1281,424,1221,536,1221,536,1096,621,346,571];
 
 
-function deepCopy (obj) {
-
-    if ('object' === typeof obj) {
-        if (obj instanceof Array) {
-        let length = obj.length
-        let newObj = new Array(length)
-        for (let i = 0; i < length; i++) {
-            newObj[i] = (deepCopy(obj[i]))
-        }
-        return newObj
-        } else {
-            let newObj = {}
-         if (obj.prototype) {
-            newObj.prototype = obj.prototype
-        }
-        for (let key in obj) {
-            newObj[key] = deepCopy(obj[key])
-        }
-            return newObj
-        }
-    }
-    return obj
-}
 
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -82,12 +59,12 @@ for (let d = 0; d < dataDetailsId.length; d++) {
         if (doubleCut) {a++};
     } 
 }
-details.sort( (a,b) => (a.profile === b.profile) ? a.complectId - b.complectId: a.prof > b.prof );
+details.sort( (a,b) => (a.prof === b.prof) ? a.complectId - b.complectId: a.prof > b.prof );
 //console.log('details:',details);
 
-const cuts = [ {cut:1, prof:details[0].prof} ];
-maxCut = 1;
-maxCell = 1;
+let maxCut = 1;
+let maxCell = 1;
+const cuts = [ {cut:maxCut, prof:details[0].prof} ];
 details[0].cut = maxCut;
 details[0].cell = maxCell;
 for (let d = 1; d < details.length; d++) {    
@@ -101,13 +78,13 @@ for (let d = 1; d < details.length; d++) {
     if ((maxCellsAmount > 0) && (maxCell > maxCellsAmount)) {
         maxCell = 1;
         maxCut++; 
-        cuts.push({cut:curCut, prof:details[d].prof});    
+        cuts.push({cut:maxCut, prof:details[d].prof});    
     };         
     details[d].cell = maxCell; 
     details[d].cut = maxCut; 
 }
-console.log('cuts:',cuts);
-  
+//console.log('cuts:',cuts);
+//console.log('details with cuts:',details);  
 
 // * создадим (и заполним) массив плана резок <plans>
 const plans = [];
@@ -127,7 +104,6 @@ for (let cut = 0; cut < cuts.length; cut++) {
     for (let variant = 0; variant < variantsAmount; variant++) {
 
         // * получим детали резки
-        //let locDetails = deepCopy(details);
         let locDetails = details.filter(item => item.prof===cuts[cut].prof?true:false);
         shuffle(locDetails);
 
