@@ -84,7 +84,7 @@ tmpComplects.forEach((item,ind) => {
         prof: dataDetailsProfile[ind]
     });
 });
-complects.sort((a,b) => (a.order > b.order);
+complects.sort((a,b) => (a.order > b.order));
 console.log('complects:',complects);
 
 
