@@ -10,7 +10,7 @@ const dataBilletsAmount = [90,90];
 const dataBilletsLength = [6000,6000];
 
 const dataDetailsId = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72];
-const dataDetailsProfile = ['000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002751','000002751','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746'];
+const dataDetailsProfile = ['000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002751','000002751','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002751','000002751','000002751','000002751'];
 const dataDetailsComplect = ['36','36','35','35','34','34','33','33','32','32','31','31','30','30','29','29','28','28','27','27','26','26','25','25','24','24','23','23','22','22','21','21','20','20','19','19','18','18','17','17','16','16','15','15','14','14','13','13','12','12','11','11','10','10','9','9','8','8','7','7','6','6','5','5','4','4','3','3','2','2','1','1'];
 const dataDetailsAmount = [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2];
 const dataDetailsLength = [1271,456,1271,456,1271,608,1271,721,1271,721,1271,646,1271,646,1454,637,1454,612,1311,461,1311,591,1311,576,1311,581,851,544,941,539,881,431,1131,441,1221,646,1221,529,1231,556,1921,521,1251,536,1421,651,1421,651,1421,651,1421,651,1291,384,1291,384,1421,651,371,571,1281,424,1281,424,1221,536,1221,536,1096,621,346,571];
@@ -37,7 +37,7 @@ function shuffleDetailsByComplects(arrComplects, arrDetails) {
         //console.log('finded elements-',finded);
         finded.forEach((element) => {arrDetails.order = order});
     })
-    arrDetails.sort((a,b) => (a.order > b.order));
+    arrDetails.sort((a,b) => (a.order - b.order));
     //console.log('Ordered details:',arrDetails);
 }
 
@@ -58,34 +58,45 @@ for (let i = 0; i < dataBilletsProfile.length; i++) {
     } 
 }
 if (doubleCut) {
-    billets.sort((a,b) => (a.length > b.length));    
+    billets.sort((a,b) => a.len > b.len);    
 }
 //console.log('billets:',billets);
 
 
-// * создадим массив комплектов <complects>
-let complects = [];
-let tmpComplects = Array.from(new Set(dataDetailsComplect));
-//shuffle(complects);
-//complects.sort((a,b) => (a.prof === b.prof));
-let lastProf = '';
-let order = 0;
-tmpComplects.forEach((item,ind) => {
-    if (lastProf != dataDetailsProfile[ind]) {
-        order++;
-        lastProf = dataDetailsProfile[ind];
-    }
-    else if (maxCellsAmount > 0 && ind % maxCellsAmount === 0) {
-        order++;
-    }; 
-    complects.push({
-        id: item,
-        order: order,
-        prof: dataDetailsProfile[ind]
-    });
-});
-complects.sort((a,b) => (a.order > b.order));
-console.log('complects:',complects);
+// // * создадим массив комплектов <complects>
+// let complects = [];
+// let tmpComplects = Array.from(new Set(dataDetailsComplect));
+// //console.log('tmpComplects:',tmpComplects);
+// tmpComplects.forEach((item,ind) => {
+//     complects.push({
+//         id: item,
+//         order: 0,
+//         prof: dataDetailsProfile[ind]
+//     });
+// });
+// console.log('complects #1:',complects);
+
+
+// let lastProf = '';
+// let order = 0;
+// tmpComplects.forEach((item,ind) => {
+//     if (lastProf != dataDetailsProfile[ind]) {
+//         order++;
+//         lastProf = dataDetailsProfile[ind];
+//     }
+//     else if (maxCellsAmount > 0 && ind % maxCellsAmount === 0) {
+//         order++;
+//     }; 
+//     complects.push({
+//         id: item,
+//         order: order,
+//         prof: dataDetailsProfile[ind]
+//     });
+//     console.log(ind,' = ',complects[ind].order);
+// });
+// //console.log('complects:',complects);
+// //complects.sort((a,b) => (a.order - b.order));
+// //console.log('complects:',complects);
 
 
 // * создадим массив деталей 
@@ -106,7 +117,7 @@ for (let d = 0; d < dataDetailsId.length; d++) {
     } 
 }
 details.sort( (a,b) => (a.prof === b.prof) ? a.complectId - b.complectId: a.prof > b.prof );
-//console.log('details:',details);
+console.log('details:',details);
 
 
 let maxCut = 1;
