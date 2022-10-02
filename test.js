@@ -43,6 +43,23 @@ if (doubleCut) {
 }
 //console.log('billets:',billets);
 
+
+// * создадим массив комплектов <complects>
+let complects = Array.from(new Set(dataDetailsComplect));
+shuffle(complects);
+let subCut = 0;
+complects.forEach((element,ind) => {
+    if (maxCellsAmount > 0 && ind % maxCellsAmount === 0) {
+        subCut++;    
+    } 
+    element = {id: element,
+               subCut: subCut}
+    console.log(element);    
+});
+
+//console.log('complects:',complects);
+
+
 // * создадим массив деталей 
 let details = [];
 for (let d = 0; d < dataDetailsId.length; d++) {
@@ -53,7 +70,8 @@ for (let d = 0; d < dataDetailsId.length; d++) {
             len: dataDetailsLength[d],
             complect: dataDetailsComplect[d],
             cell: parseInt(0),
-            cut: parseInt(0)
+            cut: parseInt(0),
+            subCut: parseInt(0)
         };
         details.push(element);
         if (doubleCut) {a++};
@@ -61,6 +79,7 @@ for (let d = 0; d < dataDetailsId.length; d++) {
 }
 details.sort( (a,b) => (a.prof === b.prof) ? a.complectId - b.complectId: a.prof > b.prof );
 //console.log('details:',details);
+
 
 let maxCut = 1;
 let maxCell = 1;
@@ -88,6 +107,8 @@ for (let d = 1; d < details.length; d++) {
 
 // * создадим (и заполним) массив плана резок <plans>
 const plans = [];
+
+//let countProfiles = Array.from(new Set(dataBilletsProfile)).length+1;
 
 for (let cut = 0; cut < cuts.length; cut++) {
   
