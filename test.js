@@ -1,7 +1,7 @@
 
-const maxCellsAmount = 10;
+const maxCellsAmount = 8;
 const cutWith = 3;
-const variantsAmount = 1000;
+const variantsAmount = 1;
 const billetsOrder = 'FromShortToLong';
 const doubleCut = false;
 
@@ -24,6 +24,25 @@ function shuffle(array) {
     }
 } 
 
+function shuffleDetailsByComplects(arrComplects, arrDetails) {
+    let order = 0;
+    shuffle(arrComplects);
+    //console.log('proc.complects-',arrComplects,'proc.details-',arrDetails);
+    arrComplects.forEach((element,ind) => {
+        if (ind % maxCellsAmount === 0) {
+            order++;    
+        };
+        finded = arrDetails.filter(item => item.complect===element.id ?true:false); 
+
+        //console.log('finded elements-',finded);
+        finded.forEach((element) => {arrDetails.order = order});
+    })
+    arrDetails.sort((a,b) => (a.order > b.order));
+    //console.log('Ordered details:',arrDetails);
+}
+
+
+
 // * создадим массив хлыстов
 const billets = [];
 for (let i = 0; i < dataBilletsProfile.length; i++) {
@@ -45,19 +64,28 @@ if (doubleCut) {
 
 
 // * создадим массив комплектов <complects>
-let complects = Array.from(new Set(dataDetailsComplect));
-shuffle(complects);
-let subCut = 0;
-complects.forEach((element,ind) => {
-    if (maxCellsAmount > 0 && ind % maxCellsAmount === 0) {
-        subCut++;    
-    } 
-    element = {id: element,
-               subCut: subCut}
-    console.log(element);    
+let complects = [];
+let tmpComplects = Array.from(new Set(dataDetailsComplect));
+//shuffle(complects);
+//complects.sort((a,b) => (a.prof === b.prof));
+let lastProf = '';
+let order = 0;
+tmpComplects.forEach((item,ind) => {
+    if (lastProf != dataDetailsProfile[ind]) {
+        order++;
+        lastProf = dataDetailsProfile[ind];
+    }
+    else if (maxCellsAmount > 0 && ind % maxCellsAmount === 0) {
+        order++;
+    }; 
+    complects.push({
+        id: item,
+        order: order,
+        prof: dataDetailsProfile[ind]
+    });
 });
-
-//console.log('complects:',complects);
+complects.sort((a,b) => (a.order > b.order);
+console.log('complects:',complects);
 
 
 // * создадим массив деталей 
@@ -71,7 +99,7 @@ for (let d = 0; d < dataDetailsId.length; d++) {
             complect: dataDetailsComplect[d],
             cell: parseInt(0),
             cut: parseInt(0),
-            subCut: parseInt(0)
+            order: parseInt(0)
         };
         details.push(element);
         if (doubleCut) {a++};
@@ -127,6 +155,12 @@ for (let cut = 0; cut < cuts.length; cut++) {
         // * получим детали резки
         let locDetails = details.filter(item => item.prof===cuts[cut].prof?true:false);
         shuffle(locDetails);
+        if (maxCellsAmount > 0) {
+            //shuffle(complects);
+            shuffleDetailsByComplects(complects, locDetails); 
+
+            
+        };
 
         // * разложим детали на хлысты в <locBillets>
         let cutSucsess = false;
