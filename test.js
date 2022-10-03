@@ -1,5 +1,5 @@
 
-const maxCellsAmount = 8;
+const maxCellsAmount = 10;
 const cutWith = 3;
 const variantsAmount = 1;
 const billetsOrder = 'FromShortToLong';
@@ -24,24 +24,35 @@ function shuffle(array) {
     }
 } 
 
-function shuffleDetailsByComplects(arrComplects, arrDetails) {
-    let order = 0;
+
+function shuffleDetailsByComplects(arrDetails) {
+    let result = [];
+    let arrComplects = [];
+    arrDetails.forEach((item) => {
+        if (arrComplects.includes(item.complect) === false) {
+            arrComplects.push(item.complect)    
+        }   
+    });
     shuffle(arrComplects);
-    //console.log('proc.complects-',arrComplects,'proc.details-',arrDetails);
-    arrComplects.forEach((element,ind) => {
-        if (ind % maxCellsAmount === 0) {
+    //console.log('arrComplects',arrComplects);
+
+
+    let order = 0;
+    arrComplects.forEach((itemComplect,indComplect) => {
+        if (indComplect % maxCellsAmount === 0) {
             order++;    
         };
-        finded = arrDetails.filter(item => item.complect===element.id ?true:false); 
-
-        //console.log('finded elements-',finded);
-        finded.forEach((element) => {arrDetails.order = order});
-    })
-    arrDetails.sort((a,b) => (a.order - b.order));
-    //console.log('Ordered details:',arrDetails);
-}
-
-
+        arrFinded = arrDetails.filter(item => item.complect===itemComplect?true:false);
+        arrFinded.forEach((item) => {
+            item.order = order;
+            result.push(item);
+        }); 
+        
+    });
+    console.log('shuffleDetailsByComplects',result);
+    return result;
+}        
+ 
 
 // * создадим массив хлыстов
 const billets = [];
@@ -63,42 +74,6 @@ if (doubleCut) {
 //console.log('billets:',billets);
 
 
-// // * создадим массив комплектов <complects>
-// let complects = [];
-// let tmpComplects = Array.from(new Set(dataDetailsComplect));
-// //console.log('tmpComplects:',tmpComplects);
-// tmpComplects.forEach((item,ind) => {
-//     complects.push({
-//         id: item,
-//         order: 0,
-//         prof: dataDetailsProfile[ind]
-//     });
-// });
-// console.log('complects #1:',complects);
-
-
-// let lastProf = '';
-// let order = 0;
-// tmpComplects.forEach((item,ind) => {
-//     if (lastProf != dataDetailsProfile[ind]) {
-//         order++;
-//         lastProf = dataDetailsProfile[ind];
-//     }
-//     else if (maxCellsAmount > 0 && ind % maxCellsAmount === 0) {
-//         order++;
-//     }; 
-//     complects.push({
-//         id: item,
-//         order: order,
-//         prof: dataDetailsProfile[ind]
-//     });
-//     console.log(ind,' = ',complects[ind].order);
-// });
-// //console.log('complects:',complects);
-// //complects.sort((a,b) => (a.order - b.order));
-// //console.log('complects:',complects);
-
-
 // * создадим массив деталей 
 let details = [];
 for (let d = 0; d < dataDetailsId.length; d++) {
@@ -117,7 +92,7 @@ for (let d = 0; d < dataDetailsId.length; d++) {
     } 
 }
 details.sort( (a,b) => (a.prof === b.prof) ? a.complectId - b.complectId: a.prof > b.prof );
-console.log('details:',details);
+//onsole.log('details:',details);
 
 
 let maxCut = 1;
@@ -164,14 +139,17 @@ for (let cut = 0; cut < cuts.length; cut++) {
     for (let variant = 0; variant < variantsAmount; variant++) {
 
         // * получим детали резки
-        let locDetails = details.filter(item => item.prof===cuts[cut].prof?true:false);
-        shuffle(locDetails);
-        if (maxCellsAmount > 0) {
-            //shuffle(complects);
-            shuffleDetailsByComplects(complects, locDetails); 
-
-            
-        };
+        let locDetails = new Array();
+            if (maxCellsAmount === 0) {
+                locDetails = details.filter(item => item.prof===cuts[cut].prof?true:false);
+                shuffle(locDetails);
+            }
+            else {
+                let tmpDetails = details.filter(item => item.prof===cuts[cut].prof?true:false);
+                shuffle(tmpDetails);
+                locDetails = shuffleDetailsByComplects(tmpDetails); 
+            };
+        console.log('locDetails:',locDetails);
 
         // * разложим детали на хлысты в <locBillets>
         let cutSucsess = false;
