@@ -36,7 +36,6 @@ function shuffleDetailsByComplects(arrDetails) {
     shuffle(arrComplects);
     //console.log('arrComplects',arrComplects);
 
-
     let order = 0;
     arrComplects.forEach((itemComplect,indComplect) => {
         if (indComplect % maxCellsAmount === 0) {
@@ -49,7 +48,7 @@ function shuffleDetailsByComplects(arrDetails) {
         }); 
         
     });
-    console.log('shuffleDetailsByComplects',result);
+    //console.log('shuffleDetailsByComplects',result);
     return result;
 }        
  
@@ -123,7 +122,7 @@ for (let d = 1; d < details.length; d++) {
 const plans = [];
 
 //let countProfiles = Array.from(new Set(dataBilletsProfile)).length+1;
-
+function Main() {
 for (let cut = 0; cut < cuts.length; cut++) {
   
     // * значения критериев лучшего варианта резки
@@ -229,3 +228,13 @@ for (let cut = 0; cut < cuts.length; cut++) {
 } 
 
 console.log('RESULT (plans):',plans);
+
+//return plans;
+
+//console.log(document.querySelector("#table"));
+document.querySelector("#table").innerHTML = "<tr><td>1</td></tr>";
+
+
+}
+
+Main();
