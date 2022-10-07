@@ -48,6 +48,7 @@ function shuffleDetailsByComplects(arrDetails) {
         }); 
         
     });
+    //result.sort((a,b) => a.order-b.order);
     //console.log('shuffleDetailsByComplects',result);
     return result;
 }        
@@ -231,8 +232,25 @@ console.log('RESULT (plans):',plans);
 
 //return plans;
 
-//console.log(document.querySelector("#table"));
-document.querySelector("#table").innerHTML = "<tr><td>1</td></tr>";
+// * визуализация результата
+
+document.querySelector(".table").innerHTML = "<tr><td>План резки</td></tr>";
+plans.forEach((itemCut,indCut) => {
+    document.querySelector(".table").innerHTML += `<tr><td>Резка ${indCut+1}: профиль ${itemCut.prof}, остаток ${itemCut.lastBilletRest}</td></tr>`;
+    console.log('plan:',itemCut.plan);
+    itemCut.plan.forEach((itemP,indP) => {
+        document.querySelector(".table").innerHTML += `<tr><td>хлыст ${indP+1}, S=${itemP.len}</td></tr>`;
+        console.log('billet:',itemP); 
+        det ='';   
+        itemP.details.forEach((itemD,indD) =>{
+            det += `<td>${itemD.complect}->${itemD.cell}, id${itemD.id}, s=${itemD.len}</td>`;
+        });
+        det += `<td>s=${itemP.rest}</td>`;
+        document.querySelector(".table").innerHTML += `<tr><td>${det}</td></tr>`;
+
+    });
+    document.querySelector(".table").innerHTML += '';
+});
 
 
 }
