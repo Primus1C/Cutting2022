@@ -5,9 +5,9 @@ const variantsAmount = 1;
 const billetsOrder = 'FromShortToLong';
 const doubleCut = false;
 
-const dataBilletsProfile = ['000002746','000002751'];
-const dataBilletsAmount = [90,90];
-const dataBilletsLength = [6000,6000];
+const dataBilletsProfile = ['000002746','000002746','000002751'];
+const dataBilletsAmount = [2,90,90];
+const dataBilletsLength = [2000,6000,6000];
 
 const dataDetailsId = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72];
 const dataDetailsProfile = ['000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002751','000002751','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002751','000002751','000002751','000002751'];
@@ -49,7 +49,7 @@ function shuffleDetailsByComplects(arrDetails) {
         
     });
     //result.sort((a,b) => a.order-b.order);
-    //console.log('shuffleDetailsByComplects',result);
+    console.log('shuffleDetailsByComplects',result);
     return result;
 }        
  
@@ -228,28 +228,27 @@ for (let cut = 0; cut < cuts.length; cut++) {
     }
 } 
 
-console.log('RESULT (plans):',plans);
+//console.log('RESULT (plans):',plans);
 
 //return plans;
 
 // * визуализация результата
 
-document.querySelector(".table").innerHTML = "<tr><td>План резки</td></tr>";
 plans.forEach((itemCut,indCut) => {
-    document.querySelector(".table").innerHTML += `<tr><td>Резка ${indCut+1}: профиль ${itemCut.prof}, остаток ${itemCut.lastBilletRest}</td></tr>`;
-    console.log('plan:',itemCut.plan);
+  document.querySelector(".table").innerHTML += `<h2>Резка ${indCut+1}: проф.${itemCut.prof}, остаток ${itemCut.lastBilletRest}</h2>`;
+
+    
+    //console.log('plan:',itemCut.plan);
     itemCut.plan.forEach((itemP,indP) => {
-        document.querySelector(".table").innerHTML += `<tr><td>хлыст ${indP+1}, S=${itemP.len}</td></tr>`;
-        console.log('billet:',itemP); 
+        document.querySelector(".table").innerHTML += `<tr><td>хлыст ${indP+1}, S=${itemP.len}</td>`;
+        //console.log('billet:',itemP); 
         det ='';   
         itemP.details.forEach((itemD,indD) =>{
-            det += `<td>${itemD.complect}->${itemD.cell}, id${itemD.id}, s=${itemD.len}</td>`;
+            det += `<td><p1>${itemD.complect}->${itemD.cell}</p1>, id${itemD.id}, s=${itemD.len}</td>`;
         });
-        det += `<td>s=${itemP.rest}</td>`;
-        document.querySelector(".table").innerHTML += `<tr><td>${det}</td></tr>`;
-
+        det += `<td>s=${itemP.rest}</td></tr>`;
+        document.querySelector(".table").innerHTML += det;
     });
-    document.querySelector(".table").innerHTML += '';
 });
 
 

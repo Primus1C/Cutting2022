@@ -1,0 +1,22 @@
+body {
+    background-color: beige;
+    font-size: smaller;
+    font-family: 'Roboto', sans-serif;
+    border-color: black;
+}
+
+h1 {
+}
+
+h2 {
+    font-size: medium;
+    color: red;
+}
+
+p1{
+    background-color:rgb(104, 216, 250);  
+}
+
+div {
+
+}
