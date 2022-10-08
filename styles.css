@@ -13,10 +13,11 @@ h2 {
     color: red;
 }
 
-p1{
+p1 {
     background-color:rgb(104, 216, 250);  
 }
 
-div {
+page {
+    background-color:yellow;  
 
 }

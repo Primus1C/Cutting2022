@@ -1,5 +1,6 @@
 
-const maxCellsAmount = 10;
+const maxCellsAmount = 20;
+const firstCellsAmount = 5;
 const cutWith = 3;
 const variantsAmount = 1;
 const billetsOrder = 'FromShortToLong';
@@ -49,10 +50,64 @@ function shuffleDetailsByComplects(arrDetails) {
         
     });
     //result.sort((a,b) => a.order-b.order);
-    console.log('shuffleDetailsByComplects',result);
+    //console.log('shuffleDetailsByComplects',result);
     return result;
 }        
- 
+
+function subcuts(amounts) {
+    let s = [];
+    let rest = amounts;
+    let l = 0;
+    if (firstCellsAmount > 0) {
+        if (maxCellsAmount === 0) {
+            l = Math.min(firstCellsAmount,rest);
+        } else {
+            l = Math.min(firstCellsAmount,maxCellsAmount,rest);
+        };
+        //console.log('l1=',rest,l);
+        s.push(l);
+        rest -= l;
+    };
+    while (rest > 0) {
+        if (maxCellsAmount === 0) {
+            l = rest;
+        } else {
+            l = Math.min(rest,maxCellsAmount);
+        };
+        //console.log('l=',rest,l);
+        s.push(l)
+        rest -= l;    
+    };
+    //console.log('s',s);
+    return s;
+}
+
+
+// * создадим массив профилей
+const profs = [];
+dataDetailsComplect.forEach((item,ind) => {
+    if (profs.find((v,i,a)=>(v.prof===dataDetailsProfile[ind] && v.complect===item)) == undefined) {
+        profs.push({
+            prof: dataDetailsProfile[ind], 
+            complect: item
+        }) 
+    }       
+});
+profs.sort((a,b) => a.prof > b.prof);    
+console.log('profs',profs);
+
+
+//* создадим массив схем
+const chem = Array.from(new Set(dataDetailsProfile), item => {
+    let l = profs.filter(it => it.prof===item).length;
+    return {
+        prof: item, 
+        complAmount: l,
+        subcuts: subcuts(l)
+    }
+});
+console.log('chem',chem);
+
 
 // * создадим массив хлыстов
 const billets = [];
@@ -74,8 +129,9 @@ if (doubleCut) {
 //console.log('billets:',billets);
 
 
-// * создадим массив деталей 
+// * создадим массив деталей
 let details = [];
+//let chem_ = [];
 for (let d = 0; d < dataDetailsId.length; d++) {
     for (let a = 0; a < dataDetailsAmount[d]; a++) {
         let element = {
@@ -92,9 +148,11 @@ for (let d = 0; d < dataDetailsId.length; d++) {
     } 
 }
 details.sort( (a,b) => (a.prof === b.prof) ? a.complectId - b.complectId: a.prof > b.prof );
-//onsole.log('details:',details);
+//console.log('details:',details);
 
 
+
+// ! НЕ ИСПОЛЬЗУЕТСЯ
 let maxCut = 1;
 let maxCell = 1;
 const cuts = [ {cut:maxCut, prof:details[0].prof} ];
@@ -119,11 +177,36 @@ for (let d = 1; d < details.length; d++) {
 //console.log('cuts:',cuts);
 //console.log('details with cuts:',details);  
 
-// * создадим (и заполним) массив плана резок <plans>
-const plans = [];
-
-//let countProfiles = Array.from(new Set(dataBilletsProfile)).length+1;
 function Main() {
+
+    chem.forEach(itemChem => {
+  
+        // * значения критериев лучшего варианта резки
+        let bestCut = {}; 
+
+        // * получим хлысты резки
+        let locBillets = billets.filter(item => item.prof===itemChem.prof);
+        if (billetsOrder === 'FromShortToLong') {
+            locBillets.sort( (a,b) => a.len - b.len );
+        };
+
+        // * строим <variantsAmount> вариантов резки, помещая лучший из них в <bestCut>
+        for (let variant = 0; variant < variantsAmount; variant++) {
+
+            // ! получим детали резки
+
+            
+
+
+
+        }       
+
+    });
+
+}
+
+function Main_() {
+
 for (let cut = 0; cut < cuts.length; cut++) {
   
     // * значения критериев лучшего варианта резки
@@ -232,23 +315,26 @@ for (let cut = 0; cut < cuts.length; cut++) {
 
 //return plans;
 
+
+
+
 // * визуализация результата
 
+let it ='';
 plans.forEach((itemCut,indCut) => {
-  document.querySelector(".table").innerHTML += `<h2>Резка ${indCut+1}: проф.${itemCut.prof}, остаток ${itemCut.lastBilletRest}</h2>`;
+    it += `<h2>Резка ${indCut+1}: проф.${itemCut.prof}, остаток ${itemCut.lastBilletRest}</h2>`;
 
     
     //console.log('plan:',itemCut.plan);
     itemCut.plan.forEach((itemP,indP) => {
-        document.querySelector(".table").innerHTML += `<tr><td>хлыст ${indP+1}, S=${itemP.len}</td>`;
+        it += `<table class='page' border='1'><tr><td>№ ${indP+1}, S=${itemP.len}</td>`;
         //console.log('billet:',itemP); 
-        det ='';   
         itemP.details.forEach((itemD,indD) =>{
-            det += `<td><p1>${itemD.complect}->${itemD.cell}</p1>, id${itemD.id}, s=${itemD.len}</td>`;
+            it += `<td><p1>${itemD.complect}->${itemD.cell}</p1>, id${itemD.id}, s=${itemD.len}</td>`;
         });
-        det += `<td>s=${itemP.rest}</td></tr>`;
-        document.querySelector(".table").innerHTML += det;
+        it += `<td bgcolor=silver>s=${itemP.rest}</td></tr></table>`;
     });
+    document.querySelector(".page").innerHTML = it; 
 });
 
 
