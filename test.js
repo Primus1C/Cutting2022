@@ -99,11 +99,12 @@ console.log('profs',profs);
 
 //* создадим массив схем
 const chem = Array.from(new Set(dataDetailsProfile), item => {
-    let l = profs.filter(it => it.prof===item).length;
+    let complects = profs.filter(it => it.prof===item);
     return {
         prof: item, 
-        complAmount: l,
-        subcuts: subcuts(l)
+        complectsAmount: complects.length,
+        subcuts: subcuts(complects.length),
+        complects: complects.map((v,i)=>{return v.complect})
     }
 });
 console.log('chem',chem);
@@ -193,11 +194,23 @@ function Main() {
         // * строим <variantsAmount> вариантов резки, помещая лучший из них в <bestCut>
         for (let variant = 0; variant < variantsAmount; variant++) {
 
+            // * получим комплекты
+            var locComplects = itemChem.complects.slice();
+            shuffle(locComplects);    
+            //console.log('locComplects',locComplects);
+            let shift = 0;
+            itemChem.subcuts.forEach(subcut => {
+                for (let ind = 0; ind < itemChem.complectsAmount-1; ind++) {
+                    //locComplects.;
+       
+                };    
+                shift += itemChem.complectsAmount;
+
             // ! получим детали резки
-            let locDetails = [];
-            
-
-
+            //let locDetails = [];
+            locDetails = details.filter(item => item.prof===itemChem.prof?true:false);
+            //console.log('LOC',locDetails);
+            })
 
         }       
 
