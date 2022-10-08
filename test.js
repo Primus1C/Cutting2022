@@ -194,7 +194,7 @@ function Main() {
         for (let variant = 0; variant < variantsAmount; variant++) {
 
             // ! получим детали резки
-
+            let locDetails = [];
             
 
 
