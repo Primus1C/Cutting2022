@@ -1,6 +1,6 @@
 
-const maxCellsAmount = 20;
-const firstCellsAmount = 5;
+const maxCellsAmount = 3;
+const firstCellsAmount = 2;
 const cutWith = 3;
 const variantsAmount = 1;
 const billetsOrder = 'FromShortToLong';
@@ -11,7 +11,7 @@ const dataBilletsAmount = [2,90,90];
 const dataBilletsLength = [2000,6000,6000];
 
 const dataDetailsId = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72];
-const dataDetailsProfile = ['000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002751','000002751','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002751','000002751','000002751','000002751'];
+const dataDetailsProfile = ['000002746','000002746','000002751','000002751','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002751','000002751','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002751','000002751','000002751','000002751'];
 const dataDetailsComplect = ['36','36','35','35','34','34','33','33','32','32','31','31','30','30','29','29','28','28','27','27','26','26','25','25','24','24','23','23','22','22','21','21','20','20','19','19','18','18','17','17','16','16','15','15','14','14','13','13','12','12','11','11','10','10','9','9','8','8','7','7','6','6','5','5','4','4','3','3','2','2','1','1'];
 const dataDetailsAmount = [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2];
 const dataDetailsLength = [1271,456,1271,456,1271,608,1271,721,1271,721,1271,646,1271,646,1454,637,1454,612,1311,461,1311,591,1311,576,1311,581,851,544,941,539,881,431,1131,441,1221,646,1221,529,1231,556,1921,521,1251,536,1421,651,1421,651,1421,651,1421,651,1291,384,1291,384,1421,651,371,571,1281,424,1281,424,1221,536,1221,536,1096,621,346,571];
@@ -26,7 +26,7 @@ function shuffle(array) {
 } 
 
 
-function shuffleDetailsByComplects(arrDetails) {
+function shuffleDetailsByComplects_(arrDetails) {
     let result = [];
     let arrComplects = [];
     arrDetails.forEach((item) => {
@@ -50,29 +50,40 @@ function shuffleDetailsByComplects(arrDetails) {
         
     });
     //result.sort((a,b) => a.order-b.order);
-    //console.log('shuffleDetailsByComplects',result);
+    //console.log('shuffleDetailsByComplects_',result);
     return result;
 }        
 
-function subcuts(amounts) {
+function shuffleDetailsOfComplect(arrDetails,arrComplects,subCut) {
+    let res = arrDetails.filter(item=>{ 
+        //item.subCut = subCut;
+        return arrComplects.indexOf(item.complect)===-1 ? false:true
+    });
+    shuffle(res);
+    res.forEach(item=>{item.subCut = subCut})
+    return res;
+}
+
+
+function subcuts(amountForCut,maxAmount,firstAmount=0) {
     let s = [];
-    let rest = amounts;
+    let rest = amountForCut;
     let l = 0;
-    if (firstCellsAmount > 0) {
-        if (maxCellsAmount === 0) {
-            l = Math.min(firstCellsAmount,rest);
+    if (firstAmount > 0) {
+        if (maxAmount === 0) {
+            l = Math.min(firstAmount,rest);
         } else {
-            l = Math.min(firstCellsAmount,maxCellsAmount,rest);
+            l = Math.min(firstAmount,maxAmount,rest);
         };
         //console.log('l1=',rest,l);
         s.push(l);
         rest -= l;
     };
     while (rest > 0) {
-        if (maxCellsAmount === 0) {
+        if (maxAmount === 0) {
             l = rest;
         } else {
-            l = Math.min(rest,maxCellsAmount);
+            l = Math.min(rest,maxAmount);
         };
         //console.log('l=',rest,l);
         s.push(l)
@@ -94,16 +105,16 @@ dataDetailsComplect.forEach((item,ind) => {
     }       
 });
 profs.sort((a,b) => a.prof > b.prof);    
-console.log('profs',profs);
+//console.log('profs',profs);
 
 
 //* создадим массив схем
-const chem = Array.from(new Set(dataDetailsProfile), item => {
+const chem = Array.from(new Set(dataDetailsProfile), (item,ind) => {
     let complects = profs.filter(it => it.prof===item);
     return {
         prof: item, 
         complectsAmount: complects.length,
-        subcuts: subcuts(complects.length),
+        subcuts: subcuts(complects.length,maxCellsAmount,ind===0?firstCellsAmount:0),
         complects: complects.map((v,i)=>{return v.complect})
     }
 });
@@ -142,7 +153,7 @@ for (let d = 0; d < dataDetailsId.length; d++) {
             complect: dataDetailsComplect[d],
             cell: parseInt(0),
             cut: parseInt(0),
-            order: parseInt(0)
+            subcut: parseInt(0)
         };
         details.push(element);
         if (doubleCut) {a++};
@@ -152,8 +163,8 @@ details.sort( (a,b) => (a.prof === b.prof) ? a.complectId - b.complectId: a.prof
 //console.log('details:',details);
 
 
-
 // ! НЕ ИСПОЛЬЗУЕТСЯ
+/* 
 let maxCut = 1;
 let maxCell = 1;
 const cuts = [ {cut:maxCut, prof:details[0].prof} ];
@@ -175,12 +186,124 @@ for (let d = 1; d < details.length; d++) {
     details[d].cell = maxCell; 
     details[d].cut = maxCut; 
 }
-//console.log('cuts:',cuts);
-//console.log('details with cuts:',details);  
+console.log('cuts:',cuts);
+console.log('details with cuts:',details);   */
+
+const plans = [];
+
+function Main_() {
+
+    for (let cut = 0; cut < cuts.length; cut++) {
+      
+        // * значения критериев лучшего варианта резки
+        let bestCut = {}; 
+    
+        // * получим хлысты резки
+        let locBillets = billets.filter(item => item.prof===cuts[cut].prof?true:false);
+        if (billetsOrder === 'FromShortToLong') {
+            locBillets.sort( (a,b) => a.len - b.len );
+        };
+    
+        // * строим <variantsAmount> вариантов резки, помещая лучший из них в <bestCut>
+        for (let variant = 0; variant < variantsAmount; variant++) {
+    
+            // * получим детали резки
+            let locDetails = new Array();
+                if (maxCellsAmount === 0) {
+                    locDetails = details.filter(item => item.prof===cuts[cut].prof?true:false);
+                    shuffle(locDetails);
+                }
+                else {
+                    let tmpDetails = details.filter(item => item.prof===cuts[cut].prof?true:false);
+                    shuffle(tmpDetails);
+                    locDetails = shuffleDetailsByComplects_(tmpDetails); 
+                };
+            console.log('locDetails:',locDetails);
+    
+            // * разложим детали на хлысты в <locBillets>
+            let cutSucsess = false;
+            if (doubleCut) {
+                for (let d = 0; d < locDetails.length; d++) { 
+                    cutSucsess = false;
+                    for (let b = 0; b < locBillets.length; b+2) {
+                        let rest = (locBillets[b].rest < locBillets[b+1].rest) ? locBillets[b].rest : locBillets[b+1].rest;
+                        if (rest - cutWith >= locDetails[d].len) {
+                            locBillets[b].rest = locBillets[b].rest - cutWith - locDetails[d].len; 
+                            locBillets[b+1].rest = locBillets[b].rest - cutWith - locDetails[d].len; 
+                            locBillets[b].details.push(locDetails[d]);
+                            locBillets[b+1].details.push(locDetails[d]);
+                            cutSucsess = true;
+                            break;
+                        }
+                    }    
+                    if (!cutSucsess) {
+                        break; 
+                    }
+                }
+            } else {
+                for (let d = 0; d < locDetails.length; d++) {
+                    cutSucsess = false;
+                    for (let b = 0; b < locBillets.length; b++) {
+                        if ((locBillets[b].rest) - cutWith >= locDetails[d].len) {
+                            locBillets[b].rest = locBillets[b].rest - cutWith - locDetails[d].len; 
+                            locBillets[b].details.push(locDetails[d]);
+                            cutSucsess = true;
+                            break;
+                        }
+                    }  
+                    if (!cutSucsess) {
+                        break;   
+                    } 
+                    //console.log(cutSucsess,locBillets);       
+                }
+            };
+            //console.log(locBillets);
+            //console.log(cutSucsess);
+    
+            if (cutSucsess) {
+                // * сравним текущию раскладку <locBillets> с лучшей <bestCut>
+                let locBilletsWithDetails = locBillets.filter(item => item.rest===item.len?false:true);
+                let locBilletAmount = locBilletsWithDetails.length;
+                //console.log('locBilletsWithDetails',locBilletsWithDetails);   
+                //console.log(locBilletAmount);                         
+                if (locBilletAmount > 0) {
+                    let locLastRest = locBilletsWithDetails[locBilletAmount-1].rest;
+                    let changeBestCut = false;
+                    //console.log(bestCut);
+                    if ('billetAmount' in bestCut) {
+                        if (locBilletAmount < bestCut.billetAmount) {
+                            changeBestCut = true;  
+                        } else if (locLastRest < bestCut.lastBilletRest) {
+                            changeBestCut = true; 
+                        };
+                    } else {
+                        changeBestCut = true;
+                    };
+                    //console.log(changeBestCut);
+                    if (changeBestCut) {
+                        bestCut.billetAmount = locBilletAmount;
+                        bestCut.lastBilletRest = locLastRest;
+                        bestCut.plan = locBilletsWithDetails;
+                        bestCut.prof = cuts[cut].prof;
+                        bestCut.doubleCut = doubleCut
+                        //console.log(bestCut);
+                    }
+                } 
+            }
+        };
+        // * добавим лучшую расладку <bestCut> в план <plans>
+        if ('billetAmount' in bestCut) {
+            plans.push(bestCut);
+        }
+    } 
+    }
+    
 
 function Main() {
-
-    chem.forEach(itemChem => {
+    
+    // * разбивка по профилям
+    chem.forEach((itemChem,indChem) => {
+        console.log('ПРОФИЛЬ ===========================================',itemChem.prof,':');
   
         // * значения критериев лучшего варианта резки
         let bestCut = {}; 
@@ -190,145 +313,114 @@ function Main() {
         if (billetsOrder === 'FromShortToLong') {
             locBillets.sort( (a,b) => a.len - b.len );
         };
+        //console.log('locBillets',locBillets)
 
         // * строим <variantsAmount> вариантов резки, помещая лучший из них в <bestCut>
         for (let variant = 0; variant < variantsAmount; variant++) {
 
-            // * получим комплекты
+            // * получим комплекты и детали резки - <locChem>
             var locComplects = itemChem.complects.slice();
-            shuffle(locComplects);    
+            shuffle(locComplects); 
             console.log('locComplects',locComplects);
+           
+            locChem =[];
+            locDetails = [];
             let num = 0;
-            let cutComplects = [];
-            itemChem.subcuts.forEach(subcut => {
-                for (let ind = 0; ind < itemChem.complectsAmount-1; ind++) {
-                    cutComplects.push({
-                        subcut: subcut,
-                        complect: itemChem.complects[num]       
-                    });
-                    num += 1;
-                };    
+            itemChem.subcuts.forEach((subcut,subcutInd) => {
+                let arrC = [];
+                for (let ind = 0; ind < subcut; ind++) {
+                    arrC.push(locComplects[num]);
+                    num += 1;                    
+                    };
+                arrD = shuffleDetailsOfComplect(details,arrC,subcutInd);   
+                locChem.push({
+                    complects: arrC,
+                    subcut: subcutInd,
+                    details: arrD
+                });   
+                locDetails = locDetails.concat(arrD);                 
+            });     
+            console.log('locChem '+itemChem.prof,locChem);
+            console.log('locDetails',locDetails);
 
-            // ! получим детали резки
-            //let locDetails = [];
-            locDetails = details.filter(item => item.prof===itemChem.prof?true:false);
-            //console.log('LOC',locDetails);
-            })
-            console.log('cutComplects',cutComplects);
+             // * разложим детали <locDetails> на хлыстах <locBillets>    
+            let cutSucsess = false;
+            if (doubleCut) {
+                 /* for (let d = 0; d < locDetails.length; d++) { 
+                     cutSucsess = false;
+                     for (let b = 0; b < locBillets.length; b+2) {
+                         let rest = (locBillets[b].rest < locBillets[b+1].rest) ? locBillets[b].rest : locBillets[b+1].rest;
+                         if (rest - cutWith >= locDetails[d].len) {
+                             locBillets[b].rest = locBillets[b].rest - cutWith - locDetails[d].len; 
+                             locBillets[b+1].rest = locBillets[b].rest - cutWith - locDetails[d].len; 
+                             locBillets[b].details.push(locDetails[d]);
+                             locBillets[b+1].details.push(locDetails[d]);
+                             cutSucsess = true;
+                             break;
+                         }
+                     }    
+                     if (!cutSucsess) {
+                         break; 
+                     }
+                 } */
+            } else {
+                for (let d = 0; d < locDetails.length; d++) {
+                    cutSucsess = false;
+                    for (let b = 0; b < locBillets.length; b++) {
+                        if ((locBillets[b].rest) - cutWith >= locDetails[d].len) {
+                            locBillets[b].rest = locBillets[b].rest - cutWith - locDetails[d].len; 
+                            locBillets[b].details.push(locDetails[d]);
+                            cutSucsess = true;
+                            break;
+                        }
+                    }  
+                    if (!cutSucsess) {break} 
+                }
+            };
+            console.log('cut ok',cutSucsess,locBillets);             
 
-        }       
+            if (cutSucsess) {
+                // * сравним текущию раскладку <locBillets> с лучшей <bestCut>
+                let locBilletsWithDetails = locBillets.filter(item => item.rest===item.len?false:true);
+                let locBilletAmount = locBilletsWithDetails.length;
+                console.log('locBilletsWithDetails',locBilletsWithDetails);   
+                //console.log(locBilletAmount);                         
+                if (locBilletAmount > 0) {
+                    let locLastRest = locBilletsWithDetails[locBilletAmount-1].rest;
+                    let changeBestCut = false;
+                    //console.log(bestCut);
+                    if ('billetAmount' in bestCut) {
+                        if (locBilletAmount < bestCut.billetAmount) {
+                            changeBestCut = true;  
+                        } else if (locLastRest < bestCut.lastBilletRest) {
+                            changeBestCut = true; 
+                        };
+                    } else {
+                        changeBestCut = true;
+                    };
+                    //console.log(changeBestCut);
+                    if (changeBestCut) {
+                        bestCut.billetAmount = locBilletAmount;
+                        bestCut.lastBilletRest = locLastRest;
+                        bestCut.plan = locBilletsWithDetails;
+                        bestCut.prof = itemChem.prof;
+                        bestCut.doubleCut = doubleCut
+                        //console.log('bestCut',bestCut.prof,'added:',bestCut);
+                    }
+                } 
+            }
+
+        } 
+
+        // * добавим лучшую расладку <bestCut> в план <plans>
+        if ('billetAmount' in bestCut) {plans.push(bestCut)};
 
     });
+    
 
-}
 
-function Main_() {
 
-for (let cut = 0; cut < cuts.length; cut++) {
-  
-    // * значения критериев лучшего варианта резки
-    let bestCut = {}; 
-
-    // * получим хлысты резки
-    let locBillets = billets.filter(item => item.prof===cuts[cut].prof?true:false);
-    if (billetsOrder === 'FromShortToLong') {
-        locBillets.sort( (a,b) => a.len - b.len );
-    };
-
-    // * строим <variantsAmount> вариантов резки, помещая лучший из них в <bestCut>
-    for (let variant = 0; variant < variantsAmount; variant++) {
-
-        // * получим детали резки
-        let locDetails = new Array();
-            if (maxCellsAmount === 0) {
-                locDetails = details.filter(item => item.prof===cuts[cut].prof?true:false);
-                shuffle(locDetails);
-            }
-            else {
-                let tmpDetails = details.filter(item => item.prof===cuts[cut].prof?true:false);
-                shuffle(tmpDetails);
-                locDetails = shuffleDetailsByComplects(tmpDetails); 
-            };
-        console.log('locDetails:',locDetails);
-
-        // * разложим детали на хлысты в <locBillets>
-        let cutSucsess = false;
-        if (doubleCut) {
-            for (let d = 0; d < locDetails.length; d++) { 
-                cutSucsess = false;
-                for (let b = 0; b < locBillets.length; b+2) {
-                    let rest = (locBillets[b].rest < locBillets[b+1].rest) ? locBillets[b].rest : locBillets[b+1].rest;
-                    if (rest - cutWith >= locDetails[d].len) {
-                        locBillets[b].rest = locBillets[b].rest - cutWith - locDetails[d].len; 
-                        locBillets[b+1].rest = locBillets[b].rest - cutWith - locDetails[d].len; 
-                        locBillets[b].details.push(locDetails[d]);
-                        locBillets[b+1].details.push(locDetails[d]);
-                        cutSucsess = true;
-                        break;
-                    }
-                }    
-                if (!cutSucsess) {
-                    break; 
-                }
-            }
-        } else {
-            for (let d = 0; d < locDetails.length; d++) {
-                cutSucsess = false;
-                for (let b = 0; b < locBillets.length; b++) {
-                    if ((locBillets[b].rest) - cutWith >= locDetails[d].len) {
-                        locBillets[b].rest = locBillets[b].rest - cutWith - locDetails[d].len; 
-                        locBillets[b].details.push(locDetails[d]);
-                        cutSucsess = true;
-                        break;
-                    }
-                }  
-                if (!cutSucsess) {
-                    break;   
-                } 
-                //console.log(cutSucsess,locBillets);       
-            }
-        };
-        //console.log(locBillets);
-        //console.log(cutSucsess);
-
-        if (cutSucsess) {
-            // * сравним текущию раскладку <locBillets> с лучшей <bestCut>
-            let locBilletsWithDetails = locBillets.filter(item => item.rest===item.len?false:true);
-            let locBilletAmount = locBilletsWithDetails.length;
-            //console.log(locBilletsWithDetails);   
-            //console.log(locBilletAmount);                         
-            if (locBilletAmount > 0) {
-                let locLastRest = locBilletsWithDetails[locBilletAmount-1].rest;
-                let changeBestCut = false;
-                //console.log(bestCut);
-                if ('billetAmount' in bestCut) {
-                    if (locBilletAmount < bestCut.billetAmount) {
-                        changeBestCut = true;  
-                    } else if (locLastRest < bestCut.lastBilletRest) {
-                        changeBestCut = true; 
-                    };
-                } else {
-                    changeBestCut = true;
-                };
-                //console.log(changeBestCut);
-                if (changeBestCut) {
-                    bestCut.billetAmount = locBilletAmount;
-                    bestCut.lastBilletRest = locLastRest;
-                    bestCut.plan = locBilletsWithDetails;
-                    bestCut.prof = cuts[cut].prof;
-                    bestCut.doubleCut = doubleCut
-                    //console.log(bestCut);
-                }
-            } 
-        }
-    };
-    // * добавим лучшую расладку <bestCut> в план <plans>
-    if ('billetAmount' in bestCut) {
-        plans.push(bestCut);
-    }
-} 
-
-//console.log('RESULT (plans):',plans);
+console.log('RESULT (plans):',plans);
 
 //return plans;
 
@@ -339,6 +431,7 @@ for (let cut = 0; cut < cuts.length; cut++) {
 
 let it ='';
 plans.forEach((itemCut,indCut) => {
+    
     it += `<h2>Резка ${indCut+1}: проф.${itemCut.prof}, остаток ${itemCut.lastBilletRest}</h2>`;
 
     
@@ -346,15 +439,20 @@ plans.forEach((itemCut,indCut) => {
     itemCut.plan.forEach((itemP,indP) => {
         it += `<table class='page' border='1'><tr><td>№ ${indP+1}, S=${itemP.len}</td>`;
         //console.log('billet:',itemP); 
+        let lastSubCut = 0;
         itemP.details.forEach((itemD,indD) =>{
-            it += `<td><p1>${itemD.complect}->${itemD.cell}</p1>, id${itemD.id}, s=${itemD.len}</td>`;
+            if (lastSubCut!==itemD.subCut) {
+                it += `<td bgcolor=pink>${itemD.subCut}</td>`;
+                lastSubCut = itemD.subCut;    
+            };
+            it += `<td><p1>${itemD.complect}->${itemD.cell}</p1>, id${itemD.id}, s=${itemD.len}, sub=${itemD.subCut}</td>`;
         });
         it += `<td bgcolor=silver>s=${itemP.rest}</td></tr></table>`;
     });
     document.querySelector(".page").innerHTML = it; 
 });
 
-
 }
+
 
 Main();
