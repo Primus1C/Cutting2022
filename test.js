@@ -197,20 +197,24 @@ function Main() {
             // * получим комплекты
             var locComplects = itemChem.complects.slice();
             shuffle(locComplects);    
-            //console.log('locComplects',locComplects);
-            let shift = 0;
+            console.log('locComplects',locComplects);
+            let num = 0;
+            let cutComplects = [];
             itemChem.subcuts.forEach(subcut => {
                 for (let ind = 0; ind < itemChem.complectsAmount-1; ind++) {
-                    //locComplects.;
-       
+                    cutComplects.push({
+                        subcut: subcut,
+                        complect: itemChem.complects[num]       
+                    });
+                    num += 1;
                 };    
-                shift += itemChem.complectsAmount;
 
             // ! получим детали резки
             //let locDetails = [];
             locDetails = details.filter(item => item.prof===itemChem.prof?true:false);
             //console.log('LOC',locDetails);
             })
+            console.log('cutComplects',cutComplects);
 
         }       
 
