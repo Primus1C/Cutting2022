@@ -16,6 +16,9 @@ h2 {
 p1 {
     background-color:rgb(104, 216, 250);  
 }
+p2 {
+    color: rgb(76, 0, 255);
+}
 
 page {
     background-color:yellow;  
