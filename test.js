@@ -1,14 +1,14 @@
 
-const maxCellsAmount = 11;
-const firstCellsAmount = 3;
+const maxCellsAmount = 5;
+const firstCellsAmount = 2;
 const cutWith = 3;
 const variantsAmount = 1;
 const billetsOrder = 'FromShortToLong';
 const doubleCut = false;
 
-const dataBilletsProfile = ['000002746','000002746','000002751'];
-const dataBilletsAmount = [2,90,90];
-const dataBilletsLength = [2000,6000,6000];
+const dataBilletsProfile = ['000002746','000002746','000002746','000002751'];
+const dataBilletsAmount = [2,1,90,90];
+const dataBilletsLength = [2000,3000,6000,6000];
 
 const dataDetailsId = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72];
 const dataDetailsProfile = ['000002746','000002746','000002751','000002751','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002751','000002751','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002746','000002751','000002751','000002751','000002751','000002751','000002751'];
@@ -54,11 +54,14 @@ function shuffleDetailsByComplects_(arrDetails) {
     return result;
 }        
 
-function shuffledDetailsOfComplect(arrDetails, arrComplects, subCut) {
+function shuffledDetailsOfComplect(arrDetails, arrComplects, subCut, pairComplectCell) {
     const filterSet = new Set(arrComplects);
     const res = arrDetails.filter(item => filterSet.has(item.complect));
     shuffle(res);
-    res.forEach(item=>{item.subcut = subCut})
+    res.forEach((item) => {
+        item.subcut = subCut;
+        item.cell = pairComplectCell.get(item.complect);
+    });
     console.log('arrComplects',subCut,arrComplects);
     console.log('res',subCut,res);
     return res;
@@ -309,33 +312,35 @@ function Main() {
             // * получим комплекты и детали резки - <locChem>
             let locComplects = itemChem.complects.slice();
             shuffle(locComplects); 
-            console.log('locComplects',locComplects);
+            console.log('locComplects', locComplects);
 
             // * уст.соответствие комплект->ячейка
             let pairComplectCell = new Map();
             locComplects.forEach((item,ind) => {
                 let cell = ind + lastCell;
-                while (cell > maxCellsAmount) {cell -= maxCellsAmount};
+                if (cell > maxCellsAmount) {cell -= maxCellsAmount};
                 pairComplectCell.set(item,cell);
-                console.log('set:',item,cell);
+                //console.log('set:',item,cell);
             });  
-            console.log('pairComplectCell',pairComplectCell);
-            details.forEach(item => {
-                console.log('get:',item.complect,pairComplectCell.get(item.complect));
+            lastCell += locComplects.length;
+            while (lastCell >= maxCellsAmount) {lastCell -= maxCellsAmount};
+            //console.log('LASTCELL',lastCell);
+            console.log('pairComplectCell', pairComplectCell);
+            /* details.forEach(item => {
+                //console.log('get:',item.complect,pairComplectCell.get(item.complect));
                 item.cell = pairComplectCell.get(item.complect)            
-            });
+            }); */
 
             locChem =[];
             locDetails = [];
             let num = 0;
-            //let cell = 1;
             itemChem.subcuts.forEach((subcut,subcutInd) => {
                 let arrC = [];
                 for (let ind = 0; ind < subcut; ind++) {
                     arrC.push(locComplects[num]);
                     num += 1;                    
                     };
-                arrD = shuffledDetailsOfComplect(details,arrC,subcutInd); 
+                arrD = shuffledDetailsOfComplect(details, arrC, subcutInd, pairComplectCell); 
                 locChem.push({
                     complects: arrC,
                     subcut: subcutInd,
@@ -343,8 +348,8 @@ function Main() {
                 });   
                 locDetails = locDetails.concat(arrD);                 
             });     
-            console.log('locChem '+itemChem.prof,locChem);
-            console.log('locDetails',locDetails);
+            console.log('locChem '+itemChem.prof, locChem);
+            console.log('locDetails', locDetails);
 
              // * разложим детали <locDetails> на хлыстах <locBillets>    
             let cutSucsess = false;
@@ -443,7 +448,7 @@ console.log('RESULT (plans):',plans);
 let it ='';
 plans.forEach((itemCut,indCut) => {
     
-    it += `<h2>Резка ${indCut+1}: проф.${itemCut.prof}, остаток ${itemCut.lastBilletRest}</h2>`;
+    it += `<h2>Резка ${indCut+1}: проф.${itemCut.prof}, хлыстов ${itemCut.billetAmount}, остаток ${itemCut.lastBilletRest}</h2>`;
     
     //console.log('plan:',itemCut.plan);
     let lastSubCut = 0;
