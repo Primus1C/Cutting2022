@@ -2,12 +2,12 @@
 const maxCellsAmount = 5;
 const firstCellsAmount = 2;
 const cutWith = 3;
-const variantsAmount = 10000;
+const variantsAmount = 100;
 const billetsOrder = 'FromShortToLong';
-const doubleCut = false;
+const doubleCut = true;
 
 const dataBilletsProfile = ['000002746','000002746','000002746','000002751','000002751'];
-const dataBilletsAmount = [2,1,90,2,90];
+const dataBilletsAmount = [1,1,90,2,50];
 const dataBilletsLength = [2000,3000,6000,4000,6000];
 
 const dataDetailsId = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72];
@@ -148,7 +148,6 @@ for (let d = 0; d < dataDetailsId.length; d++) {
 details.sort( (a,b) => (a.prof === b.prof) ? a.complectId - b.complectId: a.prof > b.prof );
 //console.log('details:',details);
 
-
 const plans = [];
 
 function Main() {
@@ -171,24 +170,18 @@ function Main() {
         let lastCell = 1;
         for (let variant = 0; variant < variantsAmount; variant++) {
             console.warn('ВАРИАНТ',variant);
-
-            // !
-            //locBillets.rest = locBillets.len;
-            //locBillets.details = []; 
-            //locBillets.details.length = 0;
             locBillets.forEach((item,ind) => {
                 item.details = [];
                 item.rest = item.len;
             });    
             console.log('locBillets (v.'+variant+')',locBillets);   
-            // !
 
             // * получим комплекты и детали резки - <locChem>
             let locComplects = itemChem.complects.slice();
             shuffle(locComplects); 
             //console.log('locComplects', locComplects);
 
-            // * уст.соответствие комплект->ячейка
+            // * уст.соответствие <pairComplectCell> комплект->ячейка
             let pairComplectCell = new Map();
             locComplects.forEach((item,ind) => {
                 let cell = ind + lastCell;
@@ -200,7 +193,6 @@ function Main() {
             while (lastCell >= maxCellsAmount) {lastCell -= maxCellsAmount};
             console.log('pairComplectCell', pairComplectCell);
 
-            //locChem = [];
             let locDetails = [];
             let num = 0;
             itemChem.subcuts.forEach((subcut,subcutInd) => {
@@ -210,45 +202,41 @@ function Main() {
                     num += 1;                    
                     };
                 arrD = shuffledDetailsOfComplect(details, arrC, subcutInd, pairComplectCell); 
-                //locChem.push({
-                //    complects: arrC,
-                //    subcut: subcutInd,
-                //    details: arrD
-                //});   
                 locDetails = locDetails.concat(arrD);                 
             });     
-            //console.log('locChem '+itemChem.prof, locChem);
             console.log('locDetails', locDetails);
 
              // * разложим детали <locDetails> на хлыстах <locBillets>    
             let cutSucsess = false;
+            let lastBilletOfSubcut = new Map();
+            lastBilletOfSubcut.set(0,0);
             if (doubleCut) {
-                 /* for (let d = 0; d < locDetails.length; d++) { 
-                     cutSucsess = false;
-                     for (let b = 0; b < locBillets.length; b+2) {
-                         let rest = (locBillets[b].rest < locBillets[b+1].rest) ? locBillets[b].rest : locBillets[b+1].rest;
-                         if (rest - cutWith >= locDetails[d].len) {
-                             locBillets[b].rest = locBillets[b].rest - cutWith - locDetails[d].len; 
-                             locBillets[b+1].rest = locBillets[b].rest - cutWith - locDetails[d].len; 
-                             locBillets[b].details.push(locDetails[d]);
-                             locBillets[b+1].details.push(locDetails[d]);
-                             cutSucsess = true;
-                             break;
-                         }
-                     }    
-                     if (!cutSucsess) {
-                         break; 
-                     }
-                 } */
+                for (let d = 0; d < locDetails.length; d++) { 
+                    cutSucsess = false;
+                    for (let b = 0; b < locBillets.length; b+=2) {
+                        let rest = (locBillets[b].rest < locBillets[b+1].rest) ? locBillets[b].rest : locBillets[b+1].rest;
+                        if (rest - cutWith >= locDetails[d].len) {
+                            const subcut = locDetails[d].subcut;
+                            if (subcut===0 || lastBilletOfSubcut.get(subcut-1) <= b) {
+                                locBillets[b].rest = locBillets[b].rest - cutWith - locDetails[d].len; 
+                                locBillets[b+1].rest = locBillets[b+1].rest - cutWith - locDetails[d].len;
+                                locBillets[b].details.push(locDetails[d]);
+                                locBillets[b+1].details.push(locDetails[d]);
+                                cutSucsess = true;
+                                lastBilletOfSubcut.set(subcut, b);
+                                break;
+                            }
+                        }
+                    }  
+                    if (!cutSucsess) {break};
+                }
             } else {
-                let lastBilletOfSubcut = new Map();
-                lastBilletOfSubcut.set(0,0);
                 for (let d = 0; d < locDetails.length; d++) {
                     cutSucsess = false;
                     for (let b = 0; b < locBillets.length; b++) {
                         if ((locBillets[b].rest) - cutWith >= locDetails[d].len) {
                             const subcut = locDetails[d].subcut;
-                            if (subcut===0  || lastBilletOfSubcut.get(subcut-1) <= b) {
+                            if (subcut===0 || lastBilletOfSubcut.get(subcut-1) <= b) {
                                 locBillets[b].rest = locBillets[b].rest - cutWith - locDetails[d].len; 
                                 locBillets[b].details.push(locDetails[d]);
                                 cutSucsess = true;
@@ -302,8 +290,6 @@ function Main() {
         if ('billetAmount' in bestCut) {plans.push(bestCut)};
 
     });
-    
-
 
 
 console.log('RESULT (plans):',plans);
@@ -318,19 +304,26 @@ console.log('RESULT (plans):',plans);
 let it = `<h3>Первых ячеек: ${firstCellsAmount}, всего ячеек: ${maxCellsAmount}, вариантов расчета: ${variantsAmount}</h3>`;
 
 plans.forEach((itemCut,indCut) => {
-    
     it += `<h2>Резка ${indCut+1}: проф.${itemCut.prof}, хлыстов ${itemCut.billetAmount}, остаток ${itemCut.lastBilletRest}</h2>`;
-    
-    //console.log('plan:',itemCut.plan);
     let lastSubCut = 0;
     itemCut.plan.forEach((itemP,indP) => {
         it += `<table class='page' border='1'><tr><td>№ ${indP+1}, S=${itemP.len}</td>`;
-        //console.log('billet:',itemP); 
-        //let lastSubCut = 0;
-        itemP.details.forEach((itemD,indD) =>{
+        itemP.details.forEach((itemD,indD) => {
             if (lastSubCut!==itemD.subcut) {
-                it += `<td bgcolor=pink frame=Vsides>${itemD.subcut+1}></td>`;
-                lastSubCut = itemD.subcut;    
+                if (!doubleCut) {
+                    if (indP % 2 === 0) {
+                        
+                    } else {
+                        if (condition) {
+                            
+                        }
+                    }
+
+
+                } else {
+                    it += `<td bgcolor=pink frame=Vsides>${itemD.subcut+1}></td>`;
+                    lastSubCut = itemD.subcut;    
+                };
             };
             it += `<td><p1>${itemD.complect}->${itemD.cell}</p1>, <p2>id${itemD.id}</p2>, s=${itemD.len}, sub=${itemD.subcut}</td>`;
         });
