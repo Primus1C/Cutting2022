@@ -2,9 +2,9 @@
 const maxCellsAmount = 5;
 const firstCellsAmount = 2;
 const cutWith = 3;
-const variantsAmount = 100;
+const variantsAmount = 10;
 const billetsOrder = 'FromShortToLong';
-const doubleCut = true;
+const doubleCut = false;
 
 const dataBilletsProfile = ['000002746','000002746','000002746','000002751','000002751'];
 const dataBilletsAmount = [1,1,90,2,50];
@@ -185,9 +185,10 @@ function Main() {
             let pairComplectCell = new Map();
             locComplects.forEach((item,ind) => {
                 let cell = ind + lastCell;
-                if (cell > maxCellsAmount) {cell -= maxCellsAmount};
+                //if (cell > maxCellsAmount) {cell -= maxCellsAmount};
+                while (cell >= maxCellsAmount) {cell -= maxCellsAmount};
                 pairComplectCell.set(item,cell);
-                //console.log('set:',item,cell);
+                console.log('set:',item,cell);
             });  
             lastCell += locComplects.length;
             while (lastCell >= maxCellsAmount) {lastCell -= maxCellsAmount};
@@ -301,7 +302,7 @@ console.log('RESULT (plans):',plans);
 
 // * визуализация результата
 
-let it = `<h3>Первых ячеек: ${firstCellsAmount}, всего ячеек: ${maxCellsAmount}, вариантов расчета: ${variantsAmount}</h3>`;
+let it = `<h3>Первых ячеек: ${firstCellsAmount}, всего ячеек: ${maxCellsAmount}, циклов расчета: ${variantsAmount}, ${(doubleCut)?'':'НЕ '}парный рез</h3>`;
 
 plans.forEach((itemCut,indCut) => {
     it += `<h2>Резка ${indCut+1}: проф.${itemCut.prof}, хлыстов ${itemCut.billetAmount}, остаток ${itemCut.lastBilletRest}</h2>`;
@@ -310,7 +311,7 @@ plans.forEach((itemCut,indCut) => {
         it += `<table class='page' border='1'><tr><td>№ ${indP+1}, S=${itemP.len}</td>`;
         itemP.details.forEach((itemD,indD) => {
             if (lastSubCut!==itemD.subcut) {
-                if (!doubleCut) {
+                /* if (!doubleCut) {
                     if (indP % 2 === 0) {
                         
                     } else {
@@ -323,7 +324,9 @@ plans.forEach((itemCut,indCut) => {
                 } else {
                     it += `<td bgcolor=pink frame=Vsides>${itemD.subcut+1}></td>`;
                     lastSubCut = itemD.subcut;    
-                };
+                }; */
+                it += `<td bgcolor=pink frame=Vsides>${itemD.subcut+1}></td>`;
+                lastSubCut = itemD.subcut; 
             };
             it += `<td><p1>${itemD.complect}->${itemD.cell}</p1>, <p2>id${itemD.id}</p2>, s=${itemD.len}, sub=${itemD.subcut}</td>`;
         });
