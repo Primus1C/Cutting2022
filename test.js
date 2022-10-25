@@ -275,11 +275,15 @@ function Main() {
                     //console.log(changeBestCut);
                     if (changeBestCut) {
                         bestCut.billetAmount = locBilletAmount;
-                        bestCut.detailAmount = 0;
+                        bestCut.detailAmount = locBilletsWithDetails.reduce((sum, current) => {return sum + current.details.length},0);
                         bestCut.lastBilletRest = locLastRest;
                         bestCut.plan = locBilletsWithDetails;
                         bestCut.prof = itemChem.prof;
                         bestCut.doubleCut = doubleCut;
+                        bestCut.cutWith = cutWith;
+                        bestCut.rest = locBilletsWithDetails.reduce((sum, current) => {return sum + current.rest},0);
+                        let billetsLength = locBilletsWithDetails.reduce((sum, current) => {return sum + current.len},0);
+                        bestCut.proportion = bestCut.rest/billetsLength*100;
                         //console.log('bestCut',bestCut.prof,'added:',bestCut);
                     }
                 } 
