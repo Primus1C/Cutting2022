@@ -186,7 +186,7 @@ function Main() {
             locComplects.forEach((item,ind) => {
                 let cell = ind + lastCell;
                 //if (cell > maxCellsAmount) {cell -= maxCellsAmount};
-                while (cell >= maxCellsAmount) {cell -= maxCellsAmount};
+                while (cell > maxCellsAmount) {cell -= maxCellsAmount};
                 pairComplectCell.set(item,cell);
                 console.log('set:',item,cell);
             });  
